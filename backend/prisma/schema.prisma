@@ -1,0 +1,68 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Escolas parceiras de Campo Mourão e região
+model School {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+}
+
+// Níveis de Escolaridade
+model SchoolLevel {
+  id          String   @id @default(uuid())
+  year        String   // Ex: "1º ano"
+  description String   // Ex: "Ensino Médio"
+  createdAt   DateTime @default(now())
+}
+
+// Cursos / Perfis Profissionais
+model Profile {
+  id          String   @id @default(uuid())
+  name        String
+  description String
+  createdAt   DateTime @default(now())
+
+  options     Option[]
+  results     TestResult[]
+}
+
+// Perguntas (Duelos)
+model Question {
+  id        String   @id @default(uuid())
+  order     Int
+  createdAt DateTime @default(now())
+
+  options   Option[]
+}
+
+// Alternativas dos duelos
+model Option {
+  id         String   @id @default(uuid())
+  text       String
+  questionId String
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  profileId  String
+  profile    Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  weight     Int      @default(1)
+}
+
+// Resultados salvos dos estudantes
+model TestResult {
+  id          String   @id @default(uuid())
+  fullName    String
+  schoolLevel String
+  schoolName  String
+  profileId   String
+  profile     Profile  @relation(fields: [profileId], references: [id])
+  scores      Json
+  createdAt   DateTime @default(now())
+}
