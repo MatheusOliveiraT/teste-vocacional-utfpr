@@ -1,48 +1,19 @@
-// src/app/page.tsx (Exemplo de Orquestração das Telas)
-'use client';
+import { HeroCard } from "@/components/home/HeroCard";
+import { CampusGallery } from "@/components/home/CampusGallery";
+import { CourseDirectory } from "@/components/home/CourseDirectory";
+import { MethodologyBanner } from "@/components/home/MethodologyBanner";
 
-import { useState } from 'react';
-import HomeStep from '@/components/HomeStep';
-import StudentFormStep from '@/components/StudentFormStep';
-import QuizDuelsStep from '@/components/QuizDuelsStep';
-import ResultsStep from '@/components/ResultsStep';
-
-export default function VocationalTestPage() {
-  const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
-  const [studentData, setStudentData] = useState({ name: '', schoolId: '', levelId: '' });
-  const [quizResults, setQuizResults] = useState<any>(null);
-
+export default function HomePage() {
   return (
-    <main className="min-h-screen bg-utfpr-dark text-utfpr-text font-sans antialiased">
-      {step === 1 && <HomeStep onStart={() => setStep(2)} />}
-      
-      {step === 2 && (
-        <StudentFormStep 
-          onSubmit={(data) => {
-            setStudentData(data);
-            setStep(3);
-          }} 
-          onBack={() => setStep(1)} 
-        />
-      )}
+    <div className="flex flex-col w-full">
+      <section className="relative w-full py-space-2xl px-margin md:px-margin-desktop overflow-hidden flex flex-col items-center">
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[680px] h-[360px] bg-primary-container/5 blur-[120px] rounded-full pointer-events-none -z-10" />
 
-      {step === 3 && (
-        <QuizDuelsStep 
-          studentData={studentData}
-          onFinish={(results) => {
-            setQuizResults(results);
-            setStep(4);
-          }} 
-        />
-      )}
-
-      {step === 4 && (
-        <ResultsStep 
-          results={quizResults} 
-          studentName={studentData.name}
-          onRestart={() => setStep(1)} 
-        />
-      )}
-    </main>
+        <HeroCard />
+        <CampusGallery />
+        <CourseDirectory />
+        <MethodologyBanner />
+      </section>
+    </div>
   );
 }
