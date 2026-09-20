@@ -60,12 +60,18 @@ async function main() {
     });
   }
 
-  console.log('🌱 Criando os 10 Cursos da UTFPR-CM...');
+  console.log('🌱 Criando os 10 Cursos da UTFPR-CM com detalhes acadêmicos...');
 
   const cc = await prisma.profile.create({
     data: {
       name: 'Ciência da Computação',
       description: 'Focado em desenvolvimento de software, algoritmos, estrutura de dados, inteligência artificial, segurança digital e jogos digitais.',
+      degreeType: 'Bacharelado',
+      durationYears: 4,
+      semesters: 8,
+      shift: 'Integral',
+      annualVacancies: 80,
+      curriculumUrl: 'https://www.utfpr.edu.br/campomourao/cursos/bacharelados/ciencia-da-computacao',
     },
   });
 
@@ -73,6 +79,12 @@ async function main() {
     data: {
       name: 'Engenharia Eletrônica',
       description: 'Focado no projeto de circuitos, hardware, microprocessadores, automação, placas eletrônicas e Internet das Coisas (IoT).',
+      degreeType: 'Bacharelado',
+      durationYears: 5,
+      semesters: 10,
+      shift: 'Integral',
+      annualVacancies: 80,
+      curriculumUrl: 'https://www.utfpr.edu.br/campomourao/cursos/engenharias/engenharia-eletronica',
     },
   });
 
@@ -80,6 +92,12 @@ async function main() {
     data: {
       name: 'Tecnologia em Inteligência Artificial Aplicada',
       description: 'Focado na aplicação prática, técnica e ética de ferramentas de IA, modelos generativos, visão computacional e otimização de negócios.',
+      degreeType: 'Tecnologia',
+      durationYears: 2.5,
+      semesters: 5,
+      shift: 'Noturno',
+      annualVacancies: 40,
+      curriculumUrl: 'https://www.utfpr.edu.br/campomourao/cursos/tecnologias/tecnologia-em-inteligencia-artificial-aplicada',
     },
   });
 
@@ -87,6 +105,12 @@ async function main() {
     data: {
       name: 'Tecnologia em Inteligência Artificial e Sistemas Autônomos',
       description: 'Focado no desenvolvimento de robôs inteligentes, drones, veículos autônomos e sistemas de tomada de decisão em tempo real.',
+      degreeType: 'Tecnologia',
+      durationYears: 3,
+      semesters: 6,
+      shift: 'Noturno',
+      annualVacancies: 40,
+      curriculumUrl: 'https://www.utfpr.edu.br/campomourao/cursos/tecnologias',
     },
   });
 
@@ -94,6 +118,12 @@ async function main() {
     data: {
       name: 'Engenharia Civil',
       description: 'Focado em infraestrutura, edificações, pontes, barragens, estradas, geotecnia de solos e gerenciamento de obras de grande porte.',
+      degreeType: 'Bacharelado',
+      durationYears: 5,
+      semesters: 10,
+      shift: 'Integral',
+      annualVacancies: 80,
+      curriculumUrl: 'https://www.utfpr.edu.br/campomourao/cursos/engenharias/engenharia-civil',
     },
   });
 
@@ -101,6 +131,12 @@ async function main() {
     data: {
       name: 'Engenharia Ambiental e Sanitária',
       description: 'Focado em recursos hídricos, meio ambiente, energias renováveis, saneamento, reciclagem e preservação ecológica.',
+      degreeType: 'Bacharelado',
+      durationYears: 5,
+      semesters: 10,
+      shift: 'Integral',
+      annualVacancies: 80,
+      curriculumUrl: 'https://www.utfpr.edu.br/campomourao/cursos/engenharias/engenharia-ambiental-e-sanitaria',
     },
   });
 
@@ -108,6 +144,12 @@ async function main() {
     data: {
       name: 'Engenharia Química',
       description: 'Focado na transformação industrial de matéria-prima em larga escala, projeto de reatores, petroquímica e processos industriais.',
+      degreeType: 'Bacharelado',
+      durationYears: 5,
+      semesters: 10,
+      shift: 'Integral',
+      annualVacancies: 80,
+      curriculumUrl: 'https://www.utfpr.edu.br/campomourao/cursos/engenharias/engenharia-quimica',
     },
   });
 
@@ -115,6 +157,12 @@ async function main() {
     data: {
       name: 'Licenciatura em Química',
       description: 'Focado no ensino e pesquisa em reações químicas, análise laboratorial, materiais industriais e processos químicos.',
+      degreeType: 'Licenciatura',
+      durationYears: 4,
+      semesters: 8,
+      shift: 'Noturno',
+      annualVacancies: 40,
+      curriculumUrl: 'https://www.utfpr.edu.br/campomourao/cursos/licenciaturas/licenciatura-em-quimica',
     },
   });
 
@@ -122,6 +170,12 @@ async function main() {
     data: {
       name: 'Engenharia de Alimentos',
       description: 'Focado no projeto e dimensionamento de indústrias alimentícias, processos de conservação em larga escala e bioprocessos.',
+      degreeType: 'Bacharelado',
+      durationYears: 5,
+      semesters: 10,
+      shift: 'Integral',
+      annualVacancies: 80,
+      curriculumUrl: 'https://www.utfpr.edu.br/campomourao/cursos/engenharias/engenharia-de-alimentos',
     },
   });
 
@@ -129,6 +183,12 @@ async function main() {
     data: {
       name: 'Tecnologia em Alimentos',
       description: 'Focado no controle de qualidade diário, microbiologia prática, formulação de novos sabores, rotulagem e normas sanitárias.',
+      degreeType: 'Tecnologia',
+      durationYears: 3,
+      semesters: 6,
+      shift: 'Noturno',
+      annualVacancies: 40,
+      curriculumUrl: 'https://www.utfpr.edu.br/campomourao/cursos/tecnologias/tecnologia-em-alimentos',
     },
   });
 

@@ -10,7 +10,13 @@ export interface ScoreItem {
     id: string;
     name: string;
     description: string;
+    degreeType: string;
+    durationYears: number;
+    semesters: number;
+    shift: string;
+    annualVacancies: number;
+    curriculumUrl?: string | null;
   };
   score: number;
-  percentage?: number;
+  percentage: number;
 }

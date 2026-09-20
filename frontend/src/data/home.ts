@@ -35,13 +35,13 @@ export const CAMPUS_IMAGES: CampusImage[] = [
 
 export const EVALUATED_COURSES: string[] = [
   "Ciência da Computação",
-  "Engenharia de Software",
+  "Tecnologia em Inteligência Artificial e Sistemas Autônomos",
+  "Tecnologia em Inteligência Artificial Aplicada",
   "Engenharia Eletrônica",
   "Engenharia Civil",
-  "Engenharia de Alimentos",
   "Engenharia Química",
   "Engenharia Ambiental",
-  "Engenharia Mecânica",
+  "Engenharia de Alimentos",
+  "Tecnologia em Alimentos",
   "Licenciatura em Química",
-  "Agronomia",
 ];

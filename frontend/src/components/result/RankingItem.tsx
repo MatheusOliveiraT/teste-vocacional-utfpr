@@ -1,6 +1,15 @@
+// src/components/result/RankingItem.tsx
 import { Icon } from "@/components/ui/Icon";
 import { cn } from "@/lib/utils";
-import { RankedCourse } from "@/types";
+
+export interface RankingItemProps {
+  rank: number;
+  name: string;
+  percent: number;
+  degreeType: string;
+  semesters: number;
+  topMatch?: boolean;
+}
 
 export function RankingItem({
   rank,
@@ -9,7 +18,7 @@ export function RankingItem({
   degreeType,
   semesters,
   topMatch,
-}: RankedCourse) {
+}: RankingItemProps) {
   return (
     <div className="bg-surface-card rounded-xl p-space-md flex flex-col gap-space-sm hover:bg-surface-card/90 transition-all">
       <div className="flex items-center justify-between gap-2">

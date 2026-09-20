@@ -23,17 +23,6 @@ model SchoolLevel {
   createdAt   DateTime @default(now())
 }
 
-// Cursos / Perfis Profissionais
-model Profile {
-  id          String   @id @default(uuid())
-  name        String
-  description String
-  createdAt   DateTime @default(now())
-
-  options     Option[]
-  results     TestResult[]
-}
-
 // Perguntas (Duelos)
 model Question {
   id        String   @id @default(uuid())
@@ -53,6 +42,23 @@ model Option {
   profileId  String
   profile    Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
   weight     Int      @default(1)
+}
+
+// Cursos / Perfis Profissionais
+model Profile {
+  id              String   @id @default(uuid())
+  name            String
+  description     String
+  degreeType      String   @default("Bacharelado") // "Bacharelado", "Tecnologia", "Licenciatura"
+  durationYears   Float    @default(5)            // ex: 5, 4, 2.5, 3
+  semesters       Int      @default(10)           // ex: 10, 8, 5, 6
+  shift           String   @default("Integral")   // "Integral", "Noturno"
+  annualVacancies Int      @default(80)           // Número de vagas anuais
+  curriculumUrl   String?                         // Link direto da matriz curricular da UTFPR
+  createdAt       DateTime @default(now())
+
+  options         Option[]
+  results         TestResult[]
 }
 
 // Resultados salvos dos estudantes

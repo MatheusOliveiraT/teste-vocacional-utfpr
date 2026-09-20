@@ -1,8 +1,68 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { Icon } from "@/components/ui/Icon";
 import { RankingItem } from "@/components/result/RankingItem";
-import { RANKED_COURSES } from "@/data/result";
+
+interface Profile {
+  id: string;
+  name: string;
+  description: string;
+  degreeType?: string;
+  durationYears?: number;
+  semesters?: number;
+  shift?: string;
+  annualVacancies?: number;
+  curriculumUrl?: string | null;
+}
+
+interface ScoreItem {
+  profile: Profile;
+  score: number;
+  percentage: number;
+}
+
+interface ApiResponse {
+  scoresMap: Record<string, ScoreItem>;
+}
 
 export function RankingSection() {
+  const [rankedCourses, setRankedCourses] = useState<any[]>([]);
+
+  useEffect(() => {
+    try {
+      const storedResult = localStorage.getItem("utfpr_voc_result");
+      if (!storedResult) return;
+
+      const data: ApiResponse = JSON.parse(storedResult);
+
+      if (data.scoresMap) {
+        // 1. Converte o objeto scoresMap em um Array
+        const coursesArray = Object.values(data.scoresMap);
+
+        // 2. Ordena por porcentagem decrescente (e por score como desempate)
+        coursesArray.sort(
+          (a, b) => b.percentage - a.percentage || b.score - a.score
+        );
+
+        // 3. Mapeia repassando os dados acadêmicos vindos do backend Prisma
+        const formatted = coursesArray.map((item, index) => ({
+          rank: index + 1,
+          name: item.profile.name,
+          percent: item.percentage,
+          degreeType: item.profile.degreeType,
+          semesters: item.profile.semesters,
+          curriculumUrl: item.profile.curriculumUrl,
+          topMatch: index === 0,
+        }));
+
+        setRankedCourses(formatted);
+      }
+    } catch (error) {
+      console.error("Erro ao processar o ranking do localStorage:", error);
+    }
+  }, []);
+
   return (
     <section className="flex flex-col gap-space-lg">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-space-sm pb-space-xs">
@@ -26,7 +86,7 @@ export function RankingSection() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-space-md">
-        {RANKED_COURSES.map((course) => (
+        {rankedCourses.map((course) => (
           <RankingItem key={course.rank} {...course} />
         ))}
       </div>

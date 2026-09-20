@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/Card";
 import { Icon } from "@/components/ui/Icon";
@@ -8,7 +8,27 @@ import { FormField } from "@/components/identification/FormField";
 import { FormSelect } from "@/components/identification/FormSelect";
 import { PrivacyNotice } from "@/components/identification/PrivacyNotice";
 import { FormActions } from "@/components/identification/FormActions";
-import { GRADE_OPTIONS, SCHOOL_OPTIONS } from "@/data/identification";
+
+interface SelectOption {
+  value: string;
+  label: string;
+}
+
+interface School {
+  id: string;
+  name: string;
+}
+
+interface SchoolLevel {
+  id: string;
+  year: string;
+  description: string;
+}
+
+interface ApiResponse {
+  schools: School[];
+  schoolLevels: SchoolLevel[];
+}
 
 interface FormErrors {
   name?: string;
@@ -16,18 +36,62 @@ interface FormErrors {
   school?: string;
 }
 
-/**
- * Formulário de identificação do estudante (Etapa 1 de 2). Controla o estado
- * dos campos, valida antes de avançar e navega para a tela de duelos.
- */
 export function IdentificationForm() {
   const router = useRouter();
 
+  // Estados dos campos do formulário
   const [name, setName] = useState("");
   const [grade, setGrade] = useState("");
   const [school, setSchool] = useState("");
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Estados para armazenar as opções dinamicas da API
+  const [gradeOptions, setGradeOptions] = useState<SelectOption[]>([]);
+  const [schoolOptions, setSchoolOptions] = useState<SelectOption[]>([]);
+  const [loadingOptions, setLoadingOptions] = useState(true);
+
+  // Busca escolas e níveis de escolaridade no endpoint único
+  useEffect(() => {
+    async function loadFormOptions() {
+      try {
+        setLoadingOptions(true);
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+
+        const res = await fetch(`${apiUrl}/api/test/options`);
+
+        if (!res.ok) {
+          throw new Error("Falha ao buscar opções de cadastro.");
+        }
+
+        const data: ApiResponse = await res.json();
+
+        // Mapeia as escolas -> { value: id, label: name }
+        if (data.schools) {
+          const formattedSchools: SelectOption[] = data.schools.map((item) => ({
+            value: item.id,
+            label: item.name,
+          }));
+          setSchoolOptions(formattedSchools);
+        }
+
+        // Mapeia os níveis -> { value: id, label: "1º ano - Ensino Médio" }
+        if (data.schoolLevels) {
+          const formattedGrades: SelectOption[] = data.schoolLevels.map((item) => ({
+            value: item.id,
+            label: `${item.year} - ${item.description}`,
+          }));
+          setGradeOptions(formattedGrades);
+        }
+      } catch (error) {
+        console.error("Erro ao carregar dados do formulário:", error);
+      } finally {
+        setLoadingOptions(false);
+      }
+    }
+
+    loadFormOptions();
+  }, []);
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -53,7 +117,7 @@ export function IdentificationForm() {
       sessionStorage.setItem("utfpr_voc_grade", grade);
       sessionStorage.setItem("utfpr_voc_school", school);
     } catch {
-      // sessionStorage pode não estar disponível; segue o fluxo normalmente
+      // sessionStorage indisponível
     }
 
     setTimeout(() => {
@@ -105,12 +169,17 @@ export function IdentificationForm() {
           name="student-grade"
           label="Série / Escolaridade"
           icon="school"
-          placeholder="Selecione seu ano/série..."
+          placeholder={
+            loadingOptions
+              ? "Carregando escolaridades..."
+              : "Selecione seu ano/série..."
+          }
           required
           value={grade}
-          options={GRADE_OPTIONS}
+          options={gradeOptions}
           onChange={setGrade}
           error={errors.grade}
+          disabled={loadingOptions}
         />
 
         <FormSelect
@@ -118,12 +187,17 @@ export function IdentificationForm() {
           name="student-school"
           label="Sua Escola / Colégio"
           icon="domain"
-          placeholder="Selecione sua escola em Campo Mourão..."
+          placeholder={
+            loadingOptions
+              ? "Carregando escolas..."
+              : "Selecione sua escola em Campo Mourão..."
+          }
           required
           value={school}
-          options={SCHOOL_OPTIONS}
+          options={schoolOptions}
           onChange={setSchool}
           error={errors.school}
+          disabled={loadingOptions}
         />
 
         <PrivacyNotice>

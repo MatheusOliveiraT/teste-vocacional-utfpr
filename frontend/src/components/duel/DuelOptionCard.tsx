@@ -25,7 +25,7 @@ export function DuelOptionCard({
     <div
       role="button"
       tabIndex={0}
-      aria-label={`${label}: ${option.label}`}
+      aria-label={`${label}: ${option.label || option.text}`}
       onClick={onSelect}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
@@ -77,16 +77,16 @@ export function DuelOptionCard({
       </div>
 
       <div className="my-6">
-        <p className="font-headline-md text-headline-md text-text-high-contrast leading-snug">
-          {option.label}
-        </p>
+      <p className="font-headline-md text-headline-md text-text-high-contrast leading-snug">
+        {option.label || option.text}
+      </p>
       </div>
 
       <div className="flex items-center justify-between pt-2 border-t border-border-subtle/50">
         <span className="font-label-sm text-label-sm text-text-muted flex items-center gap-1.5 group-hover:text-primary-container transition-colors">
-          <kbd className="px-1.5 py-0.5 rounded bg-surface-track border border-border-subtle font-label-sm text-text-high-contrast">
-            {option.key}
-          </kbd>
+        <kbd className="px-1.5 py-0.5 rounded bg-surface-track border border-border-subtle font-label-sm text-text-high-contrast">
+          {option.key || (label === "Opção A" ? "A" : "B")}
+        </kbd>
           <span>ou clique para selecionar</span>
         </span>
         <Icon

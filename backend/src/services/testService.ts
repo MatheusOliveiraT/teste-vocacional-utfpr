@@ -58,10 +58,10 @@ export class TestService {
       include: { profile: true },
     });
 
-    // Buscar todos os perfis/cursos cadastrados
+    // Buscar todos os perfis/cursos cadastrados (já traz os novos campos)
     const allProfiles = await prisma.profile.findMany();
 
-    // Inicializar mapa de pontuação para todos os 10 cursos com 0 pontos
+    // Inicializar mapa de pontuação para todos os cursos com 0 pontos
     const scoresMap: Record<string, ScoreItem> = {};
     allProfiles.forEach((profile) => {
       scoresMap[profile.id] = {
