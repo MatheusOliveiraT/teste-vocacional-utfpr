@@ -16,6 +16,7 @@ export interface ScoreItem {
     shift: string;
     annualVacancies: number;
     curriculumUrl?: string | null;
+    imageUrl?: string | null;
   };
   score: number;
   percentage: number;

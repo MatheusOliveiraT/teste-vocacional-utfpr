@@ -9,6 +9,7 @@ export interface RankingItemProps {
   degreeType: string;
   semesters: number;
   topMatch?: boolean;
+  curriculumUrl: string;
 }
 
 export function RankingItem({
@@ -18,6 +19,7 @@ export function RankingItem({
   degreeType,
   semesters,
   topMatch,
+  curriculumUrl,
 }: RankingItemProps) {
   return (
     <div className="bg-surface-card rounded-xl p-space-md flex flex-col gap-space-sm hover:bg-surface-card/90 transition-all">
@@ -67,7 +69,7 @@ export function RankingItem({
           {degreeType} • {semesters} semestres
         </span>
         <a
-          href="#"
+          href={curriculumUrl}
           className={cn(
             "inline-flex items-center gap-0.5",
             topMatch

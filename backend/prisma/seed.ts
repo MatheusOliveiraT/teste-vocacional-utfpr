@@ -2,6 +2,16 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
+// Algoritmo Fisher-Yates para embaralhar o array
+function shuffle<T>(array: T[]): T[] {
+  const arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
 async function main() {
   console.log('🔄 Limpando banco de dados...');
   await prisma.option.deleteMany();
@@ -70,8 +80,9 @@ async function main() {
       durationYears: 4,
       semesters: 8,
       shift: 'Integral',
-      annualVacancies: 80,
-      curriculumUrl: 'https://www.utfpr.edu.br/campomourao/cursos/bacharelados/ciencia-da-computacao',
+      annualVacancies: 88,
+      curriculumUrl: 'https://www.utfpr.edu.br/cursos/coordenacoes/graduacao/campo-mourao/cm-ciencia-da-computacao',
+      imageUrl: 'https://www.utfpr.edu.br/cursos/coordenacoes/graduacao/campo-mourao/cm-ciencia-da-computacao/comp-cm.png/@@images/image'
     },
   });
 
@@ -82,9 +93,10 @@ async function main() {
       degreeType: 'Bacharelado',
       durationYears: 5,
       semesters: 10,
-      shift: 'Integral',
-      annualVacancies: 80,
-      curriculumUrl: 'https://www.utfpr.edu.br/campomourao/cursos/engenharias/engenharia-eletronica',
+      shift: 'Noturno',
+      annualVacancies: 88,
+      curriculumUrl: 'https://www.utfpr.edu.br/cursos/coordenacoes/graduacao/campo-mourao/cm-engenharia-eletronica',
+      imageUrl: 'https://www.utfpr.edu.br/cursos/coordenacoes/graduacao/campo-mourao/cm-engenharia-eletronica/capa-4.png/@@images/image',
     },
   });
 
@@ -96,8 +108,9 @@ async function main() {
       durationYears: 2.5,
       semesters: 5,
       shift: 'Noturno',
-      annualVacancies: 40,
-      curriculumUrl: 'https://www.utfpr.edu.br/campomourao/cursos/tecnologias/tecnologia-em-inteligencia-artificial-aplicada',
+      annualVacancies: 44,
+      curriculumUrl: '',
+      imageUrl: 'https://www.utfpr.edu.br/noticias/curitiba/utfpr-oferta-curso-de-especializacao-em-inteligencia-artificial-e-machine-learning/@@images/image-664-459cbb3b6788a8e8f10345436cc51e0e.png',
     },
   });
 
@@ -109,8 +122,9 @@ async function main() {
       durationYears: 3,
       semesters: 6,
       shift: 'Noturno',
-      annualVacancies: 40,
-      curriculumUrl: 'https://www.utfpr.edu.br/campomourao/cursos/tecnologias',
+      annualVacancies: 44,
+      curriculumUrl: '',
+      imageUrl: 'https://www.utfpr.edu.br/noticias/curitiba/utfpr-oferta-curso-de-especializacao-em-inteligencia-artificial-e-machine-learning/@@images/image-664-459cbb3b6788a8e8f10345436cc51e0e.png',
     },
   });
 
@@ -122,8 +136,9 @@ async function main() {
       durationYears: 5,
       semesters: 10,
       shift: 'Integral',
-      annualVacancies: 80,
-      curriculumUrl: 'https://www.utfpr.edu.br/campomourao/cursos/engenharias/engenharia-civil',
+      annualVacancies: 88,
+      curriculumUrl: 'https://www.utfpr.edu.br/cursos/coordenacoes/graduacao/campo-mourao/cm-engenharia-civil',
+      imageUrl: 'https://www.utfpr.edu.br/cursos/coordenacoes/graduacao/campo-mourao/cm-engenharia-civil/eng-civil-cm.png/@@images/image',
     },
   });
 
@@ -135,8 +150,9 @@ async function main() {
       durationYears: 5,
       semesters: 10,
       shift: 'Integral',
-      annualVacancies: 80,
-      curriculumUrl: 'https://www.utfpr.edu.br/campomourao/cursos/engenharias/engenharia-ambiental-e-sanitaria',
+      annualVacancies: 88,
+      curriculumUrl: 'https://www.utfpr.edu.br/cursos/coordenacoes/graduacao/campo-mourao/cm-engenharia-ambiental',
+      imageUrl: 'https://www.utfpr.edu.br/cursos/coordenacoes/graduacao/campo-mourao/cm-engenharia-ambiental/eng-amb-cm.png/@@images/image',
     },
   });
 
@@ -148,8 +164,9 @@ async function main() {
       durationYears: 5,
       semesters: 10,
       shift: 'Integral',
-      annualVacancies: 80,
-      curriculumUrl: 'https://www.utfpr.edu.br/campomourao/cursos/engenharias/engenharia-quimica',
+      annualVacancies: 44,
+      curriculumUrl: 'https://www.utfpr.edu.br/cursos/coordenacoes/graduacao/campo-mourao/cm-engenharia-quimica',
+      imageUrl: 'https://www.utfpr.edu.br/cursos/coordenacoes/graduacao/campo-mourao/cm-engenharia-quimica/eng-quim-cm.png/@@images/image',
     },
   });
 
@@ -161,8 +178,9 @@ async function main() {
       durationYears: 4,
       semesters: 8,
       shift: 'Noturno',
-      annualVacancies: 40,
-      curriculumUrl: 'https://www.utfpr.edu.br/campomourao/cursos/licenciaturas/licenciatura-em-quimica',
+      annualVacancies: 44,
+      curriculumUrl: 'https://www.utfpr.edu.br/cursos/coordenacoes/graduacao/campo-mourao/cm-licenciatura-em-quimica',
+      imageUrl: 'https://www.utfpr.edu.br/cursos/coordenacoes/graduacao/campo-mourao/cm-engenharia-quimica/eng-quim-cm.png/@@images/image',
     },
   });
 
@@ -174,8 +192,9 @@ async function main() {
       durationYears: 5,
       semesters: 10,
       shift: 'Integral',
-      annualVacancies: 80,
-      curriculumUrl: 'https://www.utfpr.edu.br/campomourao/cursos/engenharias/engenharia-de-alimentos',
+      annualVacancies: 44,
+      curriculumUrl: 'https://www.utfpr.edu.br/cursos/coordenacoes/graduacao/campo-mourao/cm-engenharia-de-alimentos',
+      imageUrl: 'https://www.utfpr.edu.br/cursos/coordenacoes/graduacao/campo-mourao/cm-engenharia-de-alimentos/eng-alimentos-cm.png/@@images/image',
     },
   });
 
@@ -187,187 +206,127 @@ async function main() {
       durationYears: 3,
       semesters: 6,
       shift: 'Noturno',
-      annualVacancies: 40,
-      curriculumUrl: 'https://www.utfpr.edu.br/campomourao/cursos/tecnologias/tecnologia-em-alimentos',
+      annualVacancies: 44,
+      curriculumUrl: 'https://www.utfpr.edu.br/cursos/coordenacoes/graduacao/campo-mourao/cm-tecnologia-em-alimentos',
+      imageUrl: 'https://www.utfpr.edu.br/cursos/coordenacoes/graduacao/campo-mourao/cm-tecnologia-em-alimentos/daaeq-banner-renata-fuchs_page-0001.jpg/@@images/image',
     },
   });
 
-  console.log('❓ Criando TODAS as 36 Perguntas/Duelos do Teste Vocacional...');
+  console.log('❓ Coletando todas as 60 opções originais e gerando 30 duelos aleatórios...');
 
-  const rawQuestions = [
-    // --- GRUPO A: Ciência da Computação x Engenharia Eletrônica (6 Duelos) ---
-    {
-      optionA: { text: 'Estudar sobre inteligência artificial', profileId: cc.id },
-      optionB: { text: 'Saber como um celular funciona', profileId: engEletronica.id },
-    },
-    {
-      optionA: { text: 'Desenvolver videogames', profileId: cc.id },
-      optionB: { text: 'Estudar sobre circuitos eletrônicos', profileId: engEletronica.id },
-    },
-    {
-      optionA: { text: 'Desenvolver um site e aplicativos', profileId: cc.id },
-      optionB: { text: 'Entender sobre Internet das Coisas', profileId: engEletronica.id },
-    },
-    {
-      optionA: { text: 'Entender sobre segurança digital', profileId: cc.id },
-      optionB: { text: 'Entender como é feito uma placa eletrônica', profileId: engEletronica.id },
-    },
-    {
-      optionA: { text: 'Desenvolver software para empresas', profileId: cc.id },
-      optionB: { text: 'Saber como projetar um processador', profileId: engEletronica.id },
-    },
-    {
-      optionA: { text: 'Estudar sobre algoritmos', profileId: cc.id },
-      optionB: { text: 'Saber prototipagem eletrônica', profileId: engEletronica.id },
-    },
+  // Lista com as 72 alternativas originais completas
+  const allOptions = [
+    // Ciência da Computação
+    { text: 'Estudar sobre inteligência artificial', profileId: cc.id },
+    { text: 'Desenvolver videogames', profileId: cc.id },
+    { text: 'Desenvolver um site e aplicativos', profileId: cc.id },
+    { text: 'Entender sobre segurança digital', profileId: cc.id },
+    { text: 'Desenvolver software para empresas', profileId: cc.id },
+    { text: 'Estudar sobre algoritmos', profileId: cc.id },
 
-    // --- GRUPO B: Engenharia Civil (6 Duelos) ---
-    {
-      optionA: { text: 'Saber selecionar e testar materiais de construção', profileId: engCivil.id },
-      optionB: { text: 'Planejar a planta de uma casa', profileId: engCivil.id },
-    },
-    {
-      optionA: { text: 'Construir barragens', profileId: engCivil.id },
-      optionB: { text: 'Planejar o sistema de esgoto de uma cidade', profileId: engCivil.id },
-    },
-    {
-      optionA: { text: 'Planejar a construção de uma ponte', profileId: engCivil.id },
-      optionB: { text: 'Restaurar um edifício histórico', profileId: engCivil.id },
-    },
-    {
-      optionA: { text: 'Estudar o comportamento do solo e das rochas do local de uma construção', profileId: engCivil.id },
-      optionB: { text: 'Trabalhar em obras de urbanização', profileId: engCivil.id },
-    },
-    {
-      optionA: { text: 'Planejar a construção de apartamentos', profileId: engCivil.id },
-      optionB: { text: 'Construir estradas e rodovias', profileId: engCivil.id },
-    },
-    {
-      optionA: { text: 'Construir uma escola', profileId: engCivil.id },
-      optionB: { text: 'Entender sobre infraestrutura', profileId: engCivil.id },
-    },
+    // Engenharia Eletrônica
+    { text: 'Saber como um celular funciona', profileId: engEletronica.id },
+    { text: 'Estudar sobre circuitos eletrônicos', profileId: engEletronica.id },
+    { text: 'Entender sobre Internet das Coisas', profileId: engEletronica.id },
+    { text: 'Entender como é feito uma placa eletrônica', profileId: engEletronica.id },
+    { text: 'Saber como projetar um processador', profileId: engEletronica.id },
+    { text: 'Saber prototipagem eletrônica', profileId: engEletronica.id },
 
-    // --- GRUPO C: Engenharia Ambiental e Sanitária (6 Duelos) ---
-    {
-      optionA: { text: 'Estudar sobre meio ambiente', profileId: engAmbiental.id },
-      optionB: { text: 'Estudar sobre energias renováveis', profileId: engAmbiental.id },
-    },
-    {
-      optionA: { text: 'Desenvolver soluções de reciclagem', profileId: engAmbiental.id },
-      optionB: { text: 'Desenvolver soluções para o tratamento de água', profileId: engAmbiental.id },
-    },
-    {
-      optionA: { text: 'Monitorar a qualidade do ar, água e solo', profileId: engAmbiental.id },
-      optionB: { text: 'Planejar o tratamento de um rio', profileId: engAmbiental.id },
-    },
-    {
-      optionA: { text: 'Planejar o desenvolvimento sustentável de uma região', profileId: engAmbiental.id },
-      optionB: { text: 'Trabalhar em projetos de preservação ambiental', profileId: engAmbiental.id },
-    },
-    {
-      optionA: { text: 'Monitorar mudanças climáticas', profileId: engAmbiental.id },
-      optionB: { text: 'Planejar projetos de reflorestamento', profileId: engAmbiental.id },
-    },
-    {
-      optionA: { text: 'Fazer estudos sobre impacto ambiental', profileId: engAmbiental.id },
-      optionB: { text: 'Estudar sobre como diminuir a poluição do ar', profileId: engAmbiental.id },
-    },
+    // Engenharia Civil
+    { text: 'Saber selecionar e testar materiais de construção', profileId: engCivil.id },
+    { text: 'Planejar a planta de uma casa', profileId: engCivil.id },
+    // { text: 'Construir barragens', profileId: engCivil.id },
+    { text: 'Planejar o sistema de esgoto de uma cidade', profileId: engCivil.id },
+    // { text: 'Planejar a construção de uma ponte', profileId: engCivil.id },
+    { text: 'Restaurar um edifício histórico', profileId: engCivil.id },
+    { text: 'Estudar o comportamento do solo e das rochas do local de uma construção', profileId: engCivil.id },
+    // { text: 'Trabalhar em obras de urbanização', profileId: engCivil.id },
+    { text: 'Planejar a construção de apartamentos', profileId: engCivil.id },
+    // { text: 'Construir estradas e rodovias', profileId: engCivil.id },
+    // { text: 'Construir uma escola', profileId: engCivil.id },
+    // { text: 'Entender sobre infraestrutura', profileId: engCivil.id },
 
-    // --- GRUPO D: Engenharia Química x Licenciatura em Química (6 Duelos) ---
-    {
-      optionA: { text: 'Desenvolver produtos de limpeza', profileId: licencQuimica.id },
-      optionB: { text: 'Trabalhar em indústrias químicas de grande porte', profileId: engQuimica.id },
-    },
-    {
-      optionA: { text: 'Desenvolver produtos para a indústria farmacêutica', profileId: licencQuimica.id },
-      optionB: { text: 'Estudar química orgânica avançada', profileId: licencQuimica.id },
-    },
-    {
-      optionA: { text: 'Trabalhar em laboratórios de química', profileId: licencQuimica.id },
-      optionB: { text: 'Saber como acontecem as reações químicas', profileId: licencQuimica.id },
-    },
-    {
-      optionA: { text: 'Desenvolver práticas para garantir a segurança em processos químicos industriais', profileId: engQuimica.id },
-      optionB: { text: 'Trabalhar em grandes empresas de petróleo e refino', profileId: engQuimica.id },
-    },
-    {
-      optionA: { text: 'Saber como retirar a matéria-prima do meio ambiente e evitar danos ambientais', profileId: engQuimica.id },
-      optionB: { text: 'Estudar sobre energia nuclear', profileId: engQuimica.id },
-    },
-    {
-      optionA: { text: 'Ensinar sobre química', profileId: licencQuimica.id },
-      optionB: { text: 'Desenvolver equipamentos e reatores para usos em processos industriais químicos', profileId: engQuimica.id },
-    },
+    // Engenharia Ambiental e Sanitária
+    { text: 'Estudar sobre meio ambiente', profileId: engAmbiental.id },
+    // { text: 'Estudar sobre energias renováveis', profileId: engAmbiental.id },
+    { text: 'Desenvolver soluções de reciclagem', profileId: engAmbiental.id },
+    // { text: 'Desenvolver soluções para o tratamento de água', profileId: engAmbiental.id },
+    // { text: 'Monitorar a qualidade do ar, água e solo', profileId: engAmbiental.id },
+    { text: 'Planejar o tratamento de um rio', profileId: engAmbiental.id },
+    { text: 'Planejar o desenvolvimento sustentável de uma região', profileId: engAmbiental.id },
+    // { text: 'Trabalhar em projetos de preservação ambiental', profileId: engAmbiental.id },
+    // { text: 'Monitorar mudanças climáticas', profileId: engAmbiental.id },
+    { text: 'Planejar projetos de reflorestamento', profileId: engAmbiental.id },
+    // { text: 'Fazer estudos sobre impacto ambiental', profileId: engAmbiental.id },
+    { text: 'Estudar sobre como diminuir a poluição do ar', profileId: engAmbiental.id },
 
-    // --- GRUPO E: Engenharia de Alimentos x Tecnologia em Alimentos (6 Duelos) ---
-    {
-      optionA: { text: 'Criar novos produtos alimentícios', profileId: engAlimentos.id },
-      optionB: { text: 'Desenvolver um novo sabor para um alimento industrializado', profileId: tecAlimentos.id },
-    },
-    {
-      optionA: { text: 'Coordenar a produção em fábricas de alimentos', profileId: engAlimentos.id },
-      optionB: { text: 'Criar embalagens para alimentos', profileId: tecAlimentos.id },
-    },
-    {
-      optionA: { text: 'Analisar a qualidade do alimento', profileId: tecAlimentos.id },
-      optionB: { text: 'Desenvolver embalagens que não poluam o meio ambiente', profileId: tecAlimentos.id },
-    },
-    {
-      optionA: { text: 'Estudar produtos alimentícios existentes para melhorá-los', profileId: engAlimentos.id },
-      optionB: { text: 'Conhecer quais bactérias causam intoxicação alimentar', profileId: tecAlimentos.id },
-    },
-    {
-      optionA: { text: 'Saber como é o processo de fermentação', profileId: tecAlimentos.id },
-      optionB: { text: 'Estudar como deixar um alimento industrializado mais saudável em sua composição', profileId: tecAlimentos.id },
-    },
-    {
-      optionA: { text: 'Saber como uma indústria produz um alimento de forma segura e higiênica', profileId: tecAlimentos.id },
-      optionB: { text: 'Projetar equipamentos para uma indústria de alimentos', profileId: engAlimentos.id },
-    },
+    // Química (Licenciatura & Engenharia)
+    { text: 'Desenvolver produtos de limpeza', profileId: licencQuimica.id },
+    { text: 'Trabalhar em indústrias químicas de grande porte', profileId: engQuimica.id },
+    { text: 'Desenvolver produtos para a indústria farmacêutica', profileId: licencQuimica.id },
+    { text: 'Estudar química orgânica avançada', profileId: licencQuimica.id },
+    { text: 'Trabalhar em laboratórios de química', profileId: licencQuimica.id },
+    { text: 'Saber como acontecem as reações químicas', profileId: licencQuimica.id },
+    { text: 'Desenvolver práticas para garantir a segurança em processos químicos industriais', profileId: engQuimica.id },
+    { text: 'Trabalhar em grandes empresas de petróleo e refino', profileId: engQuimica.id },
+    { text: 'Saber como retirar a matéria-prima do meio ambiente e evitar danos ambientais', profileId: engQuimica.id },
+    { text: 'Estudar sobre energia nuclear', profileId: engQuimica.id },
+    { text: 'Ensinar sobre química', profileId: licencQuimica.id },
+    { text: 'Desenvolver equipamentos e reatores para usos em processos industriais químicos', profileId: engQuimica.id },
 
-    // --- GRUPO F: Tecnologia em IA Aplicada x Tecnologia em IA e Sistemas Autônomos (6 Duelos) ---
-    {
-      optionA: { text: 'Utilizar modelos de IA para automatizar tarefas em empresas', profileId: iaAplicada.id },
-      optionB: { text: 'Programar robôs e veículos para navegarem de forma autônoma', profileId: iaSistemasAutonomos.id },
-    },
-    {
-      optionA: { text: 'Treinar sistemas inteligentes para analisar textos, imagens e dados do mercado', profileId: iaAplicada.id },
-      optionB: { text: 'Desenvolver softwares de tomada de decisão em tempo real para drones e equipamentos', profileId: iaSistemasAutonomos.id },
-    },
-    {
-      optionA: { text: 'Criar aplicativos que usam IA para personalizar o atendimento a clientes', profileId: iaAplicada.id },
-      optionB: { text: 'Criar sistemas embarcados que aprendem com sensores fisicamente conectados', profileId: iaSistemasAutonomos.id },
-    },
-    {
-      optionA: { text: 'Garantir o uso ético, seguro e eficiente da Inteligência Artificial em softwares', profileId: iaAplicada.id },
-      optionB: { text: 'Desenvolver algoritmos de aprendizado de máquina para automação industrial pesada', profileId: iaSistemasAutonomos.id },
-    },
-    {
-      optionA: { text: 'Integrar APIs de Inteligência Artificial generativa a produtos digitais', profileId: iaAplicada.id },
-      optionB: { text: 'Programar braços robóticos e máquinas industriais autônomas', profileId: iaSistemasAutonomos.id },
-    },
-    {
-      optionA: { text: 'Analisar e otimizar processos de negócios utilizando algoritmos preditivos', profileId: iaAplicada.id },
-      optionB: { text: 'Projetar sistemas de visão computacional para orientação de veículos sem motorista', profileId: iaSistemasAutonomos.id },
-    },
+    // Alimentos (Engenharia & Tecnologia)
+    { text: 'Criar novos produtos alimentícios', profileId: engAlimentos.id },
+    { text: 'Desenvolver um novo sabor para um alimento industrializado', profileId: tecAlimentos.id },
+    { text: 'Coordenar a produção em fábricas de alimentos', profileId: engAlimentos.id },
+    { text: 'Criar embalagens para alimentos', profileId: tecAlimentos.id },
+    { text: 'Analisar a qualidade do alimento', profileId: tecAlimentos.id },
+    { text: 'Desenvolver embalagens que não poluam o meio ambiente', profileId: tecAlimentos.id },
+    { text: 'Estudar produtos alimentícios existentes para melhorá-los', profileId: engAlimentos.id },
+    { text: 'Conhecer quais bactérias causam intoxicação alimentar', profileId: tecAlimentos.id },
+    { text: 'Saber como é o processo de fermentação', profileId: tecAlimentos.id },
+    { text: 'Estudar como deixar um alimento industrializado mais saudável em sua composição', profileId: tecAlimentos.id },
+    { text: 'Saber como uma indústria produz um alimento de forma segura e higiênica', profileId: tecAlimentos.id },
+    { text: 'Projetar equipamentos para uma indústria de alimentos', profileId: engAlimentos.id },
+
+    // IA (Aplicada & Sistemas Autônomos)
+    { text: 'Utilizar modelos de IA para automatizar tarefas em empresas', profileId: iaAplicada.id },
+    { text: 'Programar robôs e veículos para navegarem de forma autônoma', profileId: iaSistemasAutonomos.id },
+    { text: 'Treinar sistemas inteligentes para analisar textos, imagens e dados do mercado', profileId: iaAplicada.id },
+    { text: 'Desenvolver softwares de tomada de decisão em tempo real para drones e equipamentos', profileId: iaSistemasAutonomos.id },
+    { text: 'Criar aplicativos que usam IA para personalizar o atendimento a clientes', profileId: iaAplicada.id },
+    { text: 'Criar sistemas embarcados que aprendem com sensores fisicamente conectados', profileId: iaSistemasAutonomos.id },
+    { text: 'Garantir o uso ético, seguro e eficiente da Inteligência Artificial em softwares', profileId: iaAplicada.id },
+    { text: 'Desenvolver algoritmos de aprendizado de máquina para automação industrial pesada', profileId: iaSistemasAutonomos.id },
+    { text: 'Integrar APIs de Inteligência Artificial generativa a produtos digitais', profileId: iaAplicada.id },
+    { text: 'Programar braços robóticos e máquinas industriais autônomas', profileId: iaSistemasAutonomos.id },
+    { text: 'Analisar e otimizar processos de negócios utilizando algoritmos preditivos', profileId: iaAplicada.id },
+    { text: 'Projetar sistemas de visão computacional para orientação de veículos sem motorista', profileId: iaSistemasAutonomos.id },
   ];
 
-  for (let i = 0; i < rawQuestions.length; i++) {
-    const q = rawQuestions[i];
+  // 1. Embaralha individualmente o pool de 72 opções
+  const shuffledOptions = shuffle(allOptions);
+
+  // 2. Agrupa as 72 opções de duas em duas, criando 36 duelos inéditos com opções cruzadas
+  const totalQuestions = shuffledOptions.length / 2;
+
+  for (let i = 0; i < totalQuestions; i++) {
+    const optA = shuffledOptions[i * 2];
+    const optB = shuffledOptions[i * 2 + 1];
+
     await prisma.question.create({
       data: {
         order: i + 1,
         options: {
           create: [
-            { text: q.optionA.text, profileId: q.optionA.profileId, weight: 1 },
-            { text: q.optionB.text, profileId: q.optionB.profileId, weight: 1 },
+            { text: optA.text, profileId: optA.profileId, weight: 1 },
+            { text: optB.text, profileId: optB.profileId, weight: 1 },
           ],
         },
       },
     });
   }
 
-  console.log(`✅ Seed concluído! ${rawQuestions.length} duelos cadastrados cobrindo os 10 cursos da UTFPR-CM.`);
+  console.log(`✅ Seed concluído! Todas as 60 alternativas foram reordenadas em ${totalQuestions} duelos cruzados aleatórios.`);
 }
 
 main()

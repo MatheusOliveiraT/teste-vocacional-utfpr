@@ -20,13 +20,13 @@ export const HERO_HIGHLIGHTS: Highlight[] = [
 
 export const CAMPUS_IMAGES: CampusImage[] = [
   {
-    src: "https://lh3.googleusercontent.com/aida-public/AB6AXuDFJAPHQMRZ0oELDaBNTmCsRSVQqxe8Czb9HMCpcaDs2In8ILQYMZ8kwxmMHlJx2fMWcVpvy7pHoaYz_-WUlTjMWc3SoKvA-yUehXeKA6SJd5mqhzSBCISY1yEAxNN1FDPg5s23zC6d8UvGadEFB9RvRYQ-9uh2J37q-_3f7JVXS3c7KHQnlly6-5PmK-EYB6pRSKWAAbaJ9db-zlE18U9nEENm04bMy8usYHl2QRuBb2MZt2HAr7yF",
+    src: "https://live.staticflickr.com/4905/45589098584_9ddf5df3e1_k.jpg",
     alt: "Laboratório tecnológico da UTFPR Campo Mourão com estudantes analisando placas de circuito e software.",
     caption: "Infraestrutura Tecnológica",
     badge: "100% Gratuito",
   },
   {
-    src: "https://lh3.googleusercontent.com/aida-public/AB6AXuB1S2svMG-ufbyhybwSP4ZdmFNQDaCRETf2uC8cYfoS4vCyNXKjIeY-zSlPH9vWb36Bqgc7X5hTXxVmWr30q7tfiXdPkbVO6we9OiM6-odkPkIoA7r_NmmphZFQlnnueLTxzbQaBWZoTqZos3xb_FmhOUpAdkU0je2R33dY2-UXkItOgQtAx0QwIJa0bbkwp4lxnqmcgiPFaeZFwUIkwuVrjQLnEDnFy46IX3D_ThUNBQIjtHVQRLUC",
+    src: "https://live.staticflickr.com/4918/33046065388_44569cee6b_k.jpg",
     alt: "Estudantes de engenharia trabalhando juntos em uma oficina do câmpus com instrumentos de medição.",
     caption: "Câmpus Campo Mourão",
     badge: "Nota Máxima MEC",

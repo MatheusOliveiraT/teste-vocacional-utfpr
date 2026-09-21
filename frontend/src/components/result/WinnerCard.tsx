@@ -16,6 +16,7 @@ interface Profile {
   shift?: string;
   annualVacancies?: number;
   curriculumUrl?: string;
+  imageUrl?: string;
 }
 
 interface ScoreItem {
@@ -164,7 +165,7 @@ export function WinnerCard() {
               </Button>
             </div>
             <a
-              href="https://www.utfpr.edu.br/futuros-alunos"
+              href="https://www.utfpr.edu.br/cursos/graduacao"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center sm:justify-start gap-1 font-label-md text-label-md text-text-muted hover:text-primary-container transition-colors py-2"

@@ -55,6 +55,7 @@ model Profile {
   shift           String   @default("Integral")   // "Integral", "Noturno"
   annualVacancies Int      @default(80)           // Número de vagas anuais
   curriculumUrl   String?                         // Link direto da matriz curricular da UTFPR
+  imageUrl        String?                         // Imagem pro resultado
   createdAt       DateTime @default(now())
 
   options         Option[]

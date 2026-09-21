@@ -10,7 +10,7 @@ export function ResultActionFooter() {
         <Button as="link" href="/identificacao" variant="ghost" icon="restart_alt" iconPosition="left">
           Refazer o Teste
         </Button>
-        <Button as="link" href="#" icon="account_balance" iconPosition="left">
+        <Button as="link" href="https://www.utfpr.edu.br/campus/campomourao" icon="account_balance" iconPosition="left">
           Conhecer o Câmpus Campo Mourão
         </Button>
         <Button

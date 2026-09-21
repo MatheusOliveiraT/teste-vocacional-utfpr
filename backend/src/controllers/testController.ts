@@ -46,4 +46,14 @@ export class TestController {
       return res.status(500).json({ error: error.message || 'Erro ao processar o resultado do teste.' });
     }
   }
+
+  // GET /api/test/results
+  async getResultsData(req: Request, res: Response) {
+    try {
+      const data = await testService.getResultsData();
+      return res.json(data);
+    } catch (error) {
+      return res.status(500).json({ error: 'Erro ao carregar resultados.' });
+    }
+  }
 }

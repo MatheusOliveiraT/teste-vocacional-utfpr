@@ -19,7 +19,7 @@ export function MethodologyBanner() {
         </div>
       </div>
       <Link
-        href="#"
+        href="https://www-opinionx-co.translate.goog/blog/paired-comparison?_x_tr_sl=en&_x_tr_tl=pt&_x_tr_hl=pt&_x_tr_pto=tc"
         className="shrink-0 font-label-md text-label-md text-primary-container hover:underline inline-flex items-center gap-1"
       >
         <span>Conhecer critérios</span>

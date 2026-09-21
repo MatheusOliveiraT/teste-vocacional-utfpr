@@ -26,6 +26,7 @@ interface TestResultData {
     profile?: {
       title?: string;
       description?: string;
+      imageUrl?: string;
       tags?: string[];
     };
   };
@@ -48,7 +49,7 @@ export function CourseSnapshot() {
   // Prepara os dados de imagem a partir do resultado ou fallback válido
   const snapshotImage = result?.topCourse?.snapshotImage || {
     // Aponta para um SVG/PNG válido na public/ ou usa o Unsplash de placeholder
-    src: "https://images.unsplash.com/photo-1562774053-701939374585?q=80&w=1000&auto=format&fit=crop",
+    src: result?.imageUrl?.name ||"https://images.unsplash.com/photo-1562774053-701939374585?q=80&w=1000&auto=format&fit=crop",
     alt: result?.winningProfile?.name || "Ambiente Acadêmico UTFPR-CM",
     caption: result?.winningProfile?.name || "Câmpus Campo Mourão",
     icon: "location_on",

@@ -22,7 +22,11 @@ export class TestService {
       select: { id: true, year: true, description: true },
     });
 
-    return { schools, schoolLevels };
+    const profiles = await prisma.profile.findMany({
+      select: { id: true, name: true },
+    });
+
+    return { schools, schoolLevels, profiles };
   }
 
   // Retorna os duelos com a ordem e as opções Lado A / Lado B aleatorizadas
@@ -122,5 +126,19 @@ export class TestService {
       winningProfile: savedResult.profile,
       scoresMap,
     };
+  }
+
+  // Retorna a lista de todos os resultados com campos selecionados
+  async getResultsData() {
+    const results = await prisma.testResult.findMany({
+      select: { 
+        id: true, 
+        fullName: true, 
+        schoolName: true,
+        profile: true, // Traz o objeto do Profile completo no select
+      },
+    });
+
+    return { results };
   }
 }
