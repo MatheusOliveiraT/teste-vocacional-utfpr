@@ -110,7 +110,7 @@ docker compose exec backend npx prisma db push
 
 5. Popular o Banco com Dados Iniciais (Seeder)
 
-Execute o script de população automática para cadastrar os 10 cursos da UTFPR-CM (com metadados acadêmicos), as 23 escolas de Campo Mourão e as 36 questões/duelos aleatorizados:
+Execute o script de população automática para cadastrar os 10 cursos da UTFPR-CM (com metadados acadêmicos), as 23 escolas de Campo Mourão e as 30 questões/duelos aleatorizados:
 
 ```bash
 docker compose exec backend npx prisma db seed
