@@ -67,8 +67,8 @@ utfpr-vocacional/
 
 #### 1. Clonar o Repositório
 ```bash
-git clone [https://github.com/MatheusoliveiraT/utfpr-vocacional.git](https://github.com/MatheusoliveiraT/utfpr-vocacional.git)
-cd utfpr-vocacional
+git clone https://github.com/MatheusoliveiraT/teste-vocacional-utfpr.git
+cd teste-vocacional-utfpr
 ```
 
 2. Configurar Arquivos de Ambiente (.env)
