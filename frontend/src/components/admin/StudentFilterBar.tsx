@@ -8,6 +8,8 @@ export interface StudentFilterBarProps {
   onQueryChange: (value: string) => void;
   schoolId: string;
   onSchoolChange: (value: string) => void;
+  gradeId: string;
+  onGradeChange: (value: string) => void;
   courseId: string;
   onCourseChange: (value: string) => void;
   onClear: () => void;
@@ -21,6 +23,8 @@ export function StudentFilterBar({
   onQueryChange,
   schoolId,
   onSchoolChange,
+  gradeId,
+  onGradeChange,
   courseId,
   onCourseChange,
   onClear,
@@ -50,7 +54,7 @@ export function StudentFilterBar({
             <select
               value={schoolId}
               onChange={(e) => onSchoolChange(e.target.value)}
-              className="appearance-none bg-surface-track text-text-high-contrast font-label-md text-label-md pl-3 pr-8 py-2.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary-container cursor-pointer max-w-[220px]"
+              className="appearance-none bg-surface-track text-text-high-contrast font-label-md text-label-md pl-3 pr-8 py-2.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary-container cursor-pointer max-w-[200px]"
             >
               <option value="">Todas as Escolas</option>
               {filterOptions.schools.map((opt) => (
@@ -67,9 +71,28 @@ export function StudentFilterBar({
 
           <div className="relative">
             <select
+              value={gradeId}
+              onChange={(e) => onGradeChange(e.target.value)}
+              className="appearance-none bg-surface-track text-text-high-contrast font-label-md text-label-md pl-3 pr-8 py-2.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary-container cursor-pointer max-w-[180px]"
+            >
+              <option value="">Todas as Séries</option>
+              {filterOptions.grades.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+            <Icon
+              name="expand_more"
+              className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-text-muted text-[18px]"
+            />
+          </div>
+
+          <div className="relative">
+            <select
               value={courseId}
               onChange={(e) => onCourseChange(e.target.value)}
-              className="appearance-none bg-surface-track text-text-high-contrast font-label-md text-label-md pl-3 pr-8 py-2.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary-container cursor-pointer max-w-[220px]"
+              className="appearance-none bg-surface-track text-text-high-contrast font-label-md text-label-md pl-3 pr-8 py-2.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary-container cursor-pointer max-w-[200px]"
             >
               <option value="">Todos os Cursos</option>
               {filterOptions.courses.map((opt) => (

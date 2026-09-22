@@ -1,5 +1,5 @@
 import prisma from '../config/prisma';
-import { SubmitTestDTO, ScoreItem } from '../types/test';
+import { SubmitTestDTO, ScoreItem, AdminUpsertResultDTO } from '../types/test';
 
 function shuffleArray<T>(array: T[]): T[] {
   const shuffled = [...array];
@@ -128,15 +128,73 @@ export class TestService {
     };
   }
 
-  // Retorna a lista de todos os resultados com campos selecionados
+  // Cria ou edita uma resposta manualmente pelo painel administrativo — ou
+  // seja, SEM passar pelo questionário de duelos (por isso não recebe
+  // selectedOptionIds; o admin escolhe o curso diretamente).
+  async adminUpsertResult(data: AdminUpsertResultDTO) {
+    const { id, fullName, schoolLevel, schoolName, profileId } = data;
+
+    const profile = await prisma.profile.findUnique({ where: { id: profileId } });
+    if (!profile) {
+      throw new Error('Perfil/curso informado não existe.');
+    }
+
+    // Resposta criada manualmente não passou pelos duelos, então registramos
+    // 100% de afinidade só com o curso escolhido (sem concorrentes), no
+    // mesmo formato de `scores` usado por calculateAndSaveResult.
+    const scores: Record<string, ScoreItem> = {
+      [profile.id]: { profile, score: 1, percentage: 100 },
+    };
+
+    if (id) {
+      const existing = await prisma.testResult.findUnique({ where: { id } });
+      if (!existing) {
+        throw new Error('Resposta não encontrada para edição.');
+      }
+
+      return prisma.testResult.update({
+        where: { id },
+        data: { fullName, schoolLevel, schoolName, profileId: profile.id, scores },
+        include: { profile: true },
+      });
+    }
+
+    return prisma.testResult.create({
+      data: { fullName, schoolLevel, schoolName, profileId: profile.id, scores },
+      include: { profile: true },
+    });
+  }
+
+  // Exclui uma resposta
+  async deleteResult(id: string) {
+    await prisma.testResult.delete({ where: { id } });
+  }
+
+  // Exclui várias respostas de uma vez (ação em massa do painel admin)
+  async deleteResults(ids: string[]) {
+    await prisma.testResult.deleteMany({ where: { id: { in: ids } } });
+  }
+
+  // --------------------------------------------------------------------
+  // ATUALIZAÇÃO RECOMENDADA em getResultsData: inclua `schoolLevel` (para
+  // o filtro/exibição de série no painel) e `createdAt` (data real da
+  // resposta — hoje o front usa a data de criação do curso como um proxy
+  // impreciso, por não ter nada melhor). `createdAt` já deve existir por
+  // padrão no seu modelo Prisma; se não existir, adicione
+  // `createdAt DateTime @default(now())` ao model TestResult.
+  // --------------------------------------------------------------------
   async getResultsData() {
     const results = await prisma.testResult.findMany({
-      select: { 
-        id: true, 
-        fullName: true, 
+      select: {
+        id: true,
+        fullName: true,
         schoolName: true,
-        profile: true, // Traz o objeto do Profile completo no select
+        schoolLevel: true, // NOVO
+        createdAt: true, // NOVO
+        profile: true,
+        scores: true,
       },
+      orderBy: { createdAt: 'desc' },
     });
 
     return { results };

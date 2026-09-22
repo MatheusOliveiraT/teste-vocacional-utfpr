@@ -45,13 +45,17 @@ export interface ExternalTestOptions {
   profiles: ExternalProfile[];
 }
 
-/** `topIndicatedCourse` em GET /api/dashboard/stats */
+/**
+ * `topIndicatedCourse` em GET /api/dashboard/stats. Pode não haver um
+ * segundo colocado (base pequena, empates, etc.), então os campos
+ * `secondIndicated*` são opcionais.
+ */
 export interface ExternalTopIndicatedCourse {
   name: string;
   count: number;
   percentage: number;
-  secondIndicatedName: string;
-  secondIndicatedPercentage: number;
+  secondIndicatedName?: string;
+  secondIndicatedPercentage?: number;
 }
 
 /**
@@ -81,7 +85,8 @@ export interface ExternalDashboardStats {
   completionRatePercentage: number;
   /** Ex.: "30/30" */
   avgDuelsCompleted: string;
-  topIndicatedCourse: ExternalTopIndicatedCourse;
+  /** `null` quando ainda não há nenhuma resposta registrada. */
+  topIndicatedCourse: ExternalTopIndicatedCourse | null;
   responsesBySchool: ExternalSchoolStat[];
   topCoursesAffinity: ExternalCourseAffinityStat[];
 }
@@ -89,16 +94,30 @@ export interface ExternalDashboardStats {
 /**
  * Item de `results` em GET /api/test/results.
  * IMPORTANTE: `schoolName` também vem como o **id** da escola aqui, não o
- * nome — mesmo tratamento de `ExternalSchoolStat.schoolName`.
+ * nome — mesmo tratamento de `ExternalSchoolStat.schoolName`. O mesmo vale
+ * para `schoolLevel`, que guarda o id de `ExternalSchoolLevel`.
  */
 export interface ExternalTestResult {
   id: string;
   fullName: string;
   schoolName: string;
+  /** Id de `ExternalSchoolLevel`. Opcional para compatibilidade com respostas antigas. */
+  schoolLevel?: string;
+  /** Data de criação da resposta em si (não a do curso). */
+  createdAt?: string;
   profile: ExternalProfile;
 }
 
 /** GET /api/test/results */
 export interface ExternalTestResultsResponse {
   results: ExternalTestResult[];
+}
+
+/** Corpo aceito por `POST /api/test/results` (cria com "id" ausente, edita com "id" presente). */
+export interface ExternalAdminResultInput {
+  id?: string;
+  fullName: string;
+  schoolLevel: string;
+  schoolName: string;
+  profileId: string;
 }

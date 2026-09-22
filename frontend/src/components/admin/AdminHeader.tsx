@@ -27,7 +27,7 @@ export function AdminHeader({
         </div>
         <div className="flex items-center gap-2 text-text-muted font-body-sm text-body-sm">
           <Icon name="calendar_today" className="text-[18px]" />
-          <span>Ano Letivo 2025 • Ingresso 1º e 2º Semestres</span>
+          <span>Feira de Profissões 2026</span>
         </div>
       </div>
 

@@ -21,3 +21,12 @@ export interface ScoreItem {
   score: number;
   percentage: number;
 }
+
+export interface AdminUpsertResultDTO {
+  /** Presente = edição de uma resposta existente. Ausente = criação. */
+  id?: string;
+  fullName: string;
+  schoolLevel: string;
+  schoolName: string;
+  profileId: string;
+}

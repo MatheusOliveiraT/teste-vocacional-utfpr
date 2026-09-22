@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { deleteStudentsByIds } from "@/lib/admin-store";
+import { deleteStudentsByIds } from "@/lib/admin-source";
 
 export async function POST(request: NextRequest) {
   const body = (await request.json()) as { ids?: string[] };

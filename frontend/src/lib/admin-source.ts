@@ -1,4 +1,7 @@
 import {
+  bulkDeleteExternalTestResults,
+  createOrUpdateExternalTestResult,
+  deleteExternalTestResult,
   fetchExternalDashboardStats,
   fetchExternalTestOptions,
   fetchExternalTestResults,
@@ -9,24 +12,19 @@ import {
   AdminStudentInput,
   BreakdownItem,
 } from "@/types";
-import { ExternalSchool, ExternalTestOptions } from "@/types/external-api";
+import {
+  ExternalSchoolLevel,
+  ExternalTestOptions,
+  ExternalTestResult,
+} from "@/types/external-api";
 
 /**
  * -----------------------------------------------------------------------
- * Adapter entre a API real do backend (localhost:4000 — três endpoints
- * somente leitura: /api/test/options, /api/dashboard/stats e
- * /api/test/results) e o formato (`AdminDashboardData`) que os componentes
- * do painel (`KpiGrid`, `AnalyticsSection`, `StudentsTable`, ...) esperam.
- *
- * IMPORTANTE — limitação conhecida: a API real hoje só expõe leitura. Não
- * existe (ainda) um endpoint para criar, editar ou excluir uma resposta.
- * Para as ações "Nova Resposta Manual", "Editar" e "Excluir" continuarem
- * funcionando na demo, mantemos aqui um pequeno *overlay* local (em
- * memória, via `globalThis`) que é mesclado por cima dos dados reais a
- * cada leitura. Assim que o backend expuser
- * `POST/PATCH/DELETE /api/test/results`, basta trocar `upsertStudent`,
- * `deleteStudentById` e `deleteStudentsByIds` abaixo para chamarem essas
- * rotas de verdade e remover o overlay.
+ * Adapter entre a API real do backend (três endpoints de leitura —
+ * /api/test/options, /api/dashboard/stats, /api/test/results — e três de
+ * escrita — POST/DELETE /api/test/results, POST /api/test/results/bulk-delete)
+ * e o formato (`AdminDashboardData`) que os componentes do painel
+ * (`KpiGrid`, `AnalyticsSection`, `StudentsTable`, ...) esperam.
  * -----------------------------------------------------------------------
  */
 
@@ -39,38 +37,18 @@ const BAR_COLOR_CYCLE = [
   "bg-text-muted/30",
 ];
 
-interface AdminOverlay {
-  /** Estudantes criados manualmente (não existem na API real). */
-  created: AdminStudent[];
-  /** Edições aplicadas por cima de um estudante vindo da API real ou criado localmente. */
-  edited: Record<string, Partial<AdminStudent>>;
-  /** Ids excluídos localmente (ocultos mesmo que ainda existam na API real). */
-  deletedIds: Set<string>;
+function buildNameMap(items: { id: string; name: string }[]): Map<string, string> {
+  return new Map(items.map((item) => [item.id, item.name]));
 }
 
-declare global {
-  // eslint-disable-next-line no-var
-  var __adminOverlay: AdminOverlay | undefined;
+function buildSchoolLevelMap(levels: ExternalSchoolLevel[]): Map<string, string> {
+  return new Map(levels.map((level) => [level.id, `${level.year} — ${level.description}`]));
 }
 
-function getOverlay(): AdminOverlay {
-  if (!globalThis.__adminOverlay) {
-    globalThis.__adminOverlay = {
-      created: [],
-      edited: {},
-      deletedIds: new Set(),
-    };
-  }
-  return globalThis.__adminOverlay;
-}
-
-function buildSchoolNameMap(schools: ExternalSchool[]): Map<string, string> {
-  return new Map(schools.map((school) => [school.id, school.name]));
-}
-
-/** `schoolName` na API real vem como id — resolve para o nome de exibição. */
-function resolveSchoolName(idOrName: string, schoolNames: Map<string, string>) {
-  return schoolNames.get(idOrName) ?? idOrName;
+/** `schoolName`/`schoolLevel` na API real vêm como id — resolve para o rótulo de exibição. */
+function resolveLabel(idOrRaw: string | undefined, labels: Map<string, string>) {
+  if (!idOrRaw) return undefined;
+  return labels.get(idOrRaw) ?? idOrRaw;
 }
 
 function toBreakdown(
@@ -86,6 +64,25 @@ function toBreakdown(
   }));
 }
 
+function toAdminStudent(
+  result: ExternalTestResult,
+  schoolNames: Map<string, string>,
+  schoolLevelLabels: Map<string, string>
+): AdminStudent {
+  return {
+    id: result.id,
+    name: result.fullName,
+    school: resolveLabel(result.schoolName, schoolNames) ?? result.schoolName,
+    schoolId: result.schoolName,
+    topMatchCourse: result.profile.name,
+    topMatchCourseId: result.profile.id,
+    grade: resolveLabel(result.schoolLevel, schoolLevelLabels),
+    schoolLevelId: result.schoolLevel,
+    shift: result.profile.shift,
+    date: result.createdAt ?? result.profile.createdAt,
+  };
+}
+
 export async function getDashboardData(): Promise<AdminDashboardData> {
   const [options, stats, resultsResponse] = await Promise.all([
     fetchExternalTestOptions(),
@@ -93,31 +90,15 @@ export async function getDashboardData(): Promise<AdminDashboardData> {
     fetchExternalTestResults(),
   ]);
 
-  const schoolNames = buildSchoolNameMap(options.schools);
-  const overlay = getOverlay();
+  const schoolNames = buildNameMap(options.schools);
+  const schoolLevelLabels = buildSchoolLevelMap(options.schoolLevels);
 
-  const students: AdminStudent[] = resultsResponse.results
-    .map((result): AdminStudent => ({
-      id: result.id,
-      name: result.fullName,
-      school: resolveSchoolName(result.schoolName, schoolNames),
-      schoolId: result.schoolName,
-      topMatchCourse: result.profile.name,
-      topMatchCourseId: result.profile.id,
-      // A API atual não retorna estes campos por resposta individual —
-      // veja o comentário de `AdminStudent` em `types/index.ts`.
-      topMatchPercent: undefined,
-      grade: undefined,
-      shift: result.profile.shift,
-      duelsCompleted: undefined,
-      duelsTotal: undefined,
-      date: result.profile.createdAt,
-    }))
-    .map((student) => ({ ...student, ...overlay.edited[student.id] }));
-
-  const allStudents = [...overlay.created, ...students].filter(
-    (student) => !overlay.deletedIds.has(student.id)
+  const students = resultsResponse.results.map((result) =>
+    toAdminStudent(result, schoolNames, schoolLevelLabels)
   );
+
+  // `topIndicatedCourse` pode vir `null` quando ainda não há respostas.
+  const topCourse = stats.topIndicatedCourse;
 
   return {
     kpis: {
@@ -129,11 +110,19 @@ export async function getDashboardData(): Promise<AdminDashboardData> {
         value: stats.totalSchoolsMapped.toString(),
         label: "Instituições",
       },
-      topCourse: {
-        name: stats.topIndicatedCourse.name,
-        share: `${stats.topIndicatedCourse.count} recomendações (${stats.topIndicatedCourse.percentage}%)`,
-        runnerUp: `Seguido por ${stats.topIndicatedCourse.secondIndicatedName} (${stats.topIndicatedCourse.secondIndicatedPercentage}%)`,
-      },
+      topCourse: topCourse
+        ? {
+            name: topCourse.name,
+            share: `${topCourse.count} recomendações (${topCourse.percentage}%)`,
+            runnerUp: topCourse.secondIndicatedName
+              ? `Seguido por ${topCourse.secondIndicatedName} (${topCourse.secondIndicatedPercentage}%)`
+              : "Ainda não há um segundo colocado",
+          }
+        : {
+            name: "Nenhuma resposta ainda",
+            share: "0 recomendações (0%)",
+            runnerUp: "Aguardando as primeiras respostas",
+          },
       completionRate: {
         value: `${stats.completionRatePercentage}%`,
         avgDuels: stats.avgDuelsCompleted,
@@ -141,7 +130,7 @@ export async function getDashboardData(): Promise<AdminDashboardData> {
     },
     schoolBreakdown: toBreakdown(
       stats.responsesBySchool.map((item) => ({
-        label: resolveSchoolName(item.schoolName, schoolNames),
+        label: resolveLabel(item.schoolName, schoolNames) ?? item.schoolName,
         count: item.count,
         percentage: item.percentage,
       })),
@@ -155,12 +144,16 @@ export async function getDashboardData(): Promise<AdminDashboardData> {
       })),
       "alunos"
     ),
-    students: allStudents,
+    students,
     totalResponses: stats.totalResponses,
     filterOptions: {
       schools: options.schools.map((school) => ({
         value: school.id,
         label: school.name,
+      })),
+      grades: options.schoolLevels.map((level) => ({
+        value: level.id,
+        label: `${level.year} — ${level.description}`,
       })),
       courses: options.profiles.map((profile) => ({
         value: profile.id,
@@ -170,84 +163,36 @@ export async function getDashboardData(): Promise<AdminDashboardData> {
   };
 }
 
-async function resolveNamesFor(
-  schoolId: string,
-  profileId: string,
-  options?: ExternalTestOptions
-) {
+async function resolveMaps(options?: ExternalTestOptions) {
   const testOptions = options ?? (await fetchExternalTestOptions());
-  const school = testOptions.schools.find((s) => s.id === schoolId);
-  const profile = testOptions.profiles.find((p) => p.id === profileId);
-  return { school, profile };
+  return {
+    schoolNames: buildNameMap(testOptions.schools),
+    schoolLevelLabels: buildSchoolLevelMap(testOptions.schoolLevels),
+  };
 }
 
-/**
- * Cria ou edita um estudante. Ver aviso no topo do arquivo: enquanto a API
- * real não tiver um endpoint de escrita, isto só existe no overlay local.
- */
+/** Cria (sem `id`) ou edita (com `id`) uma resposta, via `POST /api/test/results`. */
 export async function upsertStudent(
   input: AdminStudentInput
 ): Promise<AdminStudent> {
-  const overlay = getOverlay();
-  const { school, profile } = await resolveNamesFor(
-    input.schoolId,
-    input.profileId
-  );
+  const saved = await createOrUpdateExternalTestResult({
+    id: input.id,
+    fullName: input.name,
+    schoolLevel: input.schoolLevelId,
+    schoolName: input.schoolId,
+    profileId: input.profileId,
+  });
 
-  if (input.id) {
-    const patch: Partial<AdminStudent> = {
-      name: input.name,
-      schoolId: input.schoolId,
-      school: school?.name ?? input.schoolId,
-      topMatchCourseId: input.profileId,
-      topMatchCourse: profile?.name ?? input.profileId,
-    };
-
-    overlay.edited[input.id] = { ...overlay.edited[input.id], ...patch };
-
-    const createdIndex = overlay.created.findIndex((s) => s.id === input.id);
-    if (createdIndex >= 0) {
-      overlay.created[createdIndex] = {
-        ...overlay.created[createdIndex],
-        ...patch,
-      };
-      return overlay.created[createdIndex];
-    }
-
-    // Estudante vindo da API real: retornamos como ficaria após o patch,
-    // mesmo sem recarregar a lista completa aqui.
-    return {
-      id: input.id,
-      name: input.name,
-      school: school?.name ?? input.schoolId,
-      schoolId: input.schoolId,
-      topMatchCourse: profile?.name ?? input.profileId,
-      topMatchCourseId: input.profileId,
-      ...patch,
-    };
-  }
-
-  const created: AdminStudent = {
-    id: `manual-${Date.now()}`,
-    name: input.name,
-    school: school?.name ?? input.schoolId,
-    schoolId: input.schoolId,
-    topMatchCourse: profile?.name ?? input.profileId,
-    topMatchCourseId: input.profileId,
-    date: new Date().toISOString(),
-  };
-  overlay.created = [created, ...overlay.created];
-  return created;
+  const { schoolNames, schoolLevelLabels } = await resolveMaps();
+  return toAdminStudent(saved, schoolNames, schoolLevelLabels);
 }
 
+/** `DELETE /api/test/results/:id` */
 export async function deleteStudentById(id: string): Promise<void> {
-  const overlay = getOverlay();
-  overlay.deletedIds.add(id);
-  overlay.created = overlay.created.filter((s) => s.id !== id);
+  await deleteExternalTestResult(id);
 }
 
+/** `POST /api/test/results/bulk-delete` */
 export async function deleteStudentsByIds(ids: string[]): Promise<void> {
-  const overlay = getOverlay();
-  ids.forEach((id) => overlay.deletedIds.add(id));
-  overlay.created = overlay.created.filter((s) => !ids.includes(s.id));
+  await bulkDeleteExternalTestResults(ids);
 }

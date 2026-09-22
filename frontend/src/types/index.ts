@@ -99,18 +99,21 @@ export interface AdminStudent {
   topMatchCourse: string;
   /** Id do curso/perfil top match, usado para filtrar com precisão. */
   topMatchCourseId: string;
+  /** Rótulo de exibição da série (ex.: "3º ano — Ensino Médio"), resolvido via `/api/test/options`. */
+  grade?: string;
+  /** Id bruto da série (`ExternalTestResult.schoolLevel`), usado para filtrar com precisão. */
+  schoolLevelId?: string;
   /**
    * A API atual (`GET /api/test/results`) não retorna percentual de
-   * afinidade, série/turno do estudante nem quantidade de duelos por
-   * resposta individual — só o perfil vencedor. Esses campos ficam
-   * opcionais até o backend expor esses dados por resposta.
+   * afinidade nem quantidade de duelos por resposta individual — só o
+   * perfil vencedor. Esses campos ficam opcionais até o backend expor
+   * esses dados por resposta.
    */
   topMatchPercent?: number;
-  grade?: string;
   shift?: string;
   duelsCompleted?: number;
   duelsTotal?: number;
-  /** Melhor data disponível (hoje: `profile.createdAt`, não a data da resposta em si). */
+  /** Data de criação da própria resposta (`ExternalTestResult.createdAt`). */
   date?: string;
 }
 
@@ -123,6 +126,7 @@ export interface AdminKpis {
 
 export interface AdminFilterOptions {
   schools: SelectOption[];
+  grades: SelectOption[];
   courses: SelectOption[];
 }
 
@@ -140,14 +144,11 @@ export interface AdminDashboardData {
   filterOptions: AdminFilterOptions;
 }
 
-/**
- * Corpo aceito por `POST /api/admin/students` (criação ou edição).
- * Observação: a API real ainda não expõe endpoints de escrita para
- * respostas — ver comentário em `lib/admin-source.ts`.
- */
+/** Corpo aceito por `POST /api/admin/students` (criação ou edição). */
 export interface AdminStudentInput {
   id?: string;
   name: string;
   schoolId: string;
+  schoolLevelId: string;
   profileId: string;
 }

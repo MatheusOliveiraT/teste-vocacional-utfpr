@@ -9,13 +9,14 @@ export type ModalMode = "view" | "edit" | null;
 export interface StudentModalSaveInput {
   name: string;
   schoolId: string;
+  schoolLevelId: string;
   profileId: string;
 }
 
 export interface StudentModalProps {
   mode: ModalMode;
   student: AdminStudent | null;
-  /** Escolas e cursos/perfis reais, vindos de `GET /api/test/options`. */
+  /** Escolas, séries e cursos/perfis reais, vindos de `GET /api/test/options`. */
   filterOptions: AdminFilterOptions;
   isSaving?: boolean;
   onClose: () => void;
@@ -32,6 +33,7 @@ export function StudentModal({
 }: StudentModalProps) {
   const [name, setName] = useState("");
   const [schoolId, setSchoolId] = useState("");
+  const [schoolLevelId, setSchoolLevelId] = useState("");
   const [profileId, setProfileId] = useState("");
   const [notes, setNotes] = useState("");
 
@@ -39,6 +41,7 @@ export function StudentModal({
     if (student) {
       setName(student.name);
       setSchoolId(student.schoolId ?? "");
+      setSchoolLevelId(student.schoolLevelId ?? "");
       setProfileId(student.topMatchCourseId ?? "");
       setNotes("");
     }
@@ -85,7 +88,7 @@ export function StudentModal({
           className="flex flex-col gap-space-md"
           onSubmit={(e) => {
             e.preventDefault();
-            onSave({ name, schoolId, profileId });
+            onSave({ name, schoolId, schoolLevelId, profileId });
           }}
         >
           <div className="flex flex-col gap-1.5">
@@ -125,24 +128,45 @@ export function StudentModal({
 
             <div className="flex flex-col gap-1.5">
               <label className="font-label-md text-label-md text-text-high-contrast font-medium">
-                Curso Indicado (Perfil)
+                Série / Escolaridade
               </label>
               <select
                 required
-                value={profileId}
-                onChange={(e) => setProfileId(e.target.value)}
+                value={schoolLevelId}
+                onChange={(e) => setSchoolLevelId(e.target.value)}
                 className="appearance-none px-3.5 py-2.5 rounded-lg bg-surface-track text-text-high-contrast font-body-md text-body-md focus:outline-none focus:ring-1 focus:ring-primary-container"
               >
                 <option value="" disabled>
-                  Selecione o curso...
+                  Selecione a série...
                 </option>
-                {filterOptions.courses.map((opt) => (
+                {filterOptions.grades.map((opt) => (
                   <option key={opt.value} value={opt.value}>
                     {opt.label}
                   </option>
                 ))}
               </select>
             </div>
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label className="font-label-md text-label-md text-text-high-contrast font-medium">
+              Curso Indicado (Perfil)
+            </label>
+            <select
+              required
+              value={profileId}
+              onChange={(e) => setProfileId(e.target.value)}
+              className="appearance-none px-3.5 py-2.5 rounded-lg bg-surface-track text-text-high-contrast font-body-md text-body-md focus:outline-none focus:ring-1 focus:ring-primary-container"
+            >
+              <option value="" disabled>
+                Selecione o curso...
+              </option>
+              {filterOptions.courses.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="p-3.5 rounded-lg bg-surface-track/70 flex flex-col gap-2">

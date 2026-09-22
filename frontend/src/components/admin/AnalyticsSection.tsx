@@ -26,7 +26,7 @@ export function AnalyticsSection({
         badge="Graduações UTFPR-CM"
         items={courseAffinityBreakdown}
         footnoteLeft="Algoritmo de pareamento UTFPR ponderado"
-        footnoteRight="Total: 9 Cursos Ofertados"
+        footnoteRight="Total: 10 Cursos Ofertados"
       />
     </section>
   );

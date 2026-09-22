@@ -56,4 +56,62 @@ export class TestController {
       return res.status(500).json({ error: 'Erro ao carregar resultados.' });
     }
   }
+
+  // POST /api/test/results — cria (sem "id") ou edita (com "id") uma resposta
+  async upsertResult(req: Request, res: Response) {
+    try {
+      const { id, fullName, schoolLevel, schoolName, profileId } = req.body;
+
+      if (!fullName || !schoolLevel || !schoolName || !profileId) {
+        return res.status(400).json({
+          error:
+            'Campos obrigatórios: fullName, schoolLevel, schoolName e profileId.',
+        });
+      }
+
+      const result = await testService.adminUpsertResult({
+        id,
+        fullName,
+        schoolLevel,
+        schoolName,
+        profileId,
+      });
+
+      return res.status(id ? 200 : 201).json(result);
+    } catch (error: any) {
+      return res
+        .status(400)
+        .json({ error: error.message || 'Erro ao salvar a resposta.' });
+    }
+  }
+
+  // DELETE /api/test/results/:id
+  async deleteResult(req: Request, res: Response) {
+    try {
+      await testService.deleteResult(req.params.id);
+      return res.json({ ok: true });
+    } catch (error) {
+      return res.status(500).json({ error: 'Erro ao excluir a resposta.' });
+    }
+  }
+
+  // POST /api/test/results/bulk-delete   body: { ids: string[] }
+  async bulkDeleteResults(req: Request, res: Response) {
+    try {
+      const { ids } = req.body as { ids?: string[] };
+
+      if (!Array.isArray(ids) || ids.length === 0) {
+        return res
+          .status(400)
+          .json({ error: 'Informe um array "ids" com ao menos um id.' });
+      }
+
+      await testService.deleteResults(ids);
+      return res.json({ ok: true });
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ error: 'Erro ao excluir as respostas selecionadas.' });
+    }
+  }
 }

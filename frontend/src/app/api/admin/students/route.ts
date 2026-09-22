@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { upsertStudent } from "@/lib/admin-store";
+import { upsertStudent } from "@/lib/admin-source";
 import { AdminStudentInput } from "@/types";
 
 export async function POST(request: NextRequest) {
   const body = (await request.json()) as Partial<AdminStudentInput>;
 
-  if (!body.name || !body.grade || !body.school) {
+  if (!body.name || !body.schoolId || !body.schoolLevelId || !body.profileId) {
     return NextResponse.json(
-      { error: "Campos obrigatórios: name, grade e school." },
+      { error: "Campos obrigatórios: name, schoolId, schoolLevelId e profileId." },
       { status: 400 }
     );
   }
@@ -15,9 +15,9 @@ export async function POST(request: NextRequest) {
   const student = await upsertStudent({
     id: body.id,
     name: body.name,
-    grade: body.grade,
-    school: body.school,
-    shift: body.shift,
+    schoolId: body.schoolId,
+    schoolLevelId: body.schoolLevelId,
+    profileId: body.profileId,
   });
 
   return NextResponse.json(student, { status: body.id ? 200 : 201 });

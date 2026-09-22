@@ -26,6 +26,7 @@ const EMPTY_STUDENT: AdminStudent = {
   name: "",
   school: "",
   schoolId: "",
+  schoolLevelId: "",
   topMatchCourse: "—",
   topMatchCourseId: "",
 };
@@ -46,6 +47,7 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
   const [data, setData] = useState<AdminDashboardData>(initialData);
   const [query, setQuery] = useState("");
   const [schoolId, setSchoolId] = useState("");
+  const [gradeId, setGradeId] = useState("");
   const [courseId, setCourseId] = useState("");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [modal, setModal] = useState<{
@@ -66,11 +68,12 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
           .toLowerCase()
           .includes(normalizedQuery);
       const matchesSchool = !schoolId || student.schoolId === schoolId;
+      const matchesGrade = !gradeId || student.schoolLevelId === gradeId;
       const matchesCourse =
         !courseId || student.topMatchCourseId === courseId;
-      return matchesQuery && matchesSchool && matchesCourse;
+      return matchesQuery && matchesSchool && matchesGrade && matchesCourse;
     });
-  }, [data.students, query, schoolId, courseId]);
+  }, [data.students, query, schoolId, gradeId, courseId]);
 
   const allChecked =
     filteredStudents.length > 0 &&
@@ -95,6 +98,7 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
   function handleClearFilters() {
     setQuery("");
     setSchoolId("");
+    setGradeId("");
     setCourseId("");
   }
 
@@ -170,6 +174,7 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
         id: isEditingExisting ? modal.student?.id : undefined,
         name: updated.name,
         schoolId: updated.schoolId,
+        schoolLevelId: updated.schoolLevelId,
         profileId: updated.profileId,
       });
 
@@ -217,6 +222,8 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
         onQueryChange={setQuery}
         schoolId={schoolId}
         onSchoolChange={setSchoolId}
+        gradeId={gradeId}
+        onGradeChange={setGradeId}
         courseId={courseId}
         onCourseChange={setCourseId}
         onClear={handleClearFilters}
