@@ -38,12 +38,16 @@ O sistema oferece uma experiência gamificada de **duelos de preferências**, ge
 ## 🏗️ Arquitetura e Tecnologias
 
 O projeto é estruturado como um **Monorepo** totalmente containerizado usando **Docker** e **Docker Compose**.
+
+```text
 utfpr-vocacional/
 ├── backend/            # API RESTful em Node.js + Express + Prisma
 ├── frontend/           # Web App em Next.js 14 (App Router) + Tailwind CSS
 ├── docker-compose.yml  # Orquestração dos containers (DB, Backend, Frontend)
+├── DESIGN.md           # Arquivo com detalhes de design do projeto
+├── LICENSE
 └── README.md
-
+```
 
 ### 🖥️ Frontend
 * **Framework:** Next.js 14 (App Router & React Server Components).
