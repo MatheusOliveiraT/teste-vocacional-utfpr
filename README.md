@@ -6,27 +6,32 @@
 ![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL_15-blue)
 ![Docker](https://img.shields.io/badge/Container-Docker_Compose-blue)
 
-Uma aplicação web moderna, responsiva e performática desenvolvida para auxiliar estudantes do ensino médio e comunidade na escolha profissional, mapeando afinidades vocacionais com os **10 cursos de graduação ofertados pela UTFPR (Universidade Tecnológica Federal do Paraná) — Câmpus Campo Mourão**.
+Uma aplicação web moderna, responsiva e performática desenvolvida para auxiliar estudantes do ensino médio e comunidade na escolha profissional, mapeando afinidades vocacionais com os **10 cursos de graduação ofertados pela UTFPR — Câmpus Campo Mourão**.
 
-O sistema oferece uma experiência gamificada de **duelos de preferências (pareamento ponderado)**, gera relatórios visuais de compatibilidade para os estudantes e conta com um **painel administrativo de métricas e business intelligence** para análise da rede escolar local e regional.
+O sistema oferece uma experiência gamificada de **duelos de preferências**, gera relatórios de compatibilidade e conta com um **painel administrativo protegido com métricas e exportações de dados**.
 
 ---
 
 ## 📸 Funcionalidades
 
 ### 🌐 Área do Estudante
-* **Identificação Personalizada:** Coleta simplificada de dados (Nome, Série e Escola) com seleção unificada das 23 instituições parceiras de Campo Mourão e região.
-* **Quiz Gamificado (Duelos):** 30 perguntas/duelos aleatorizados dinamicamente, permitindo navegação fluida por clique ou atalhos de teclado (`A`, `B`, setas direcionais).
+* **Identificação Personalizada:** Coleta simplificada de dados (Nome, Série e Escola) com seleção unificada das instituições parceiras de Campo Mourão e região.
+* **Quiz Gamificado (Duelos):** 
+  * 30 perguntas/duelos aleatorizados dinamicamente.
+  * Navegação fluida por clique ou atalhos de teclado (`A`, `B`, setas direcionais, e `S` ou seta para baixo para pular).
+  * **Botão de Pular Questão:** Destaque visual limitado a no máximo **33% do total de questões** (até 10 pulos).
 * **Resultado em Tempo Real:**
   * Apresentação do curso ideal (Top Match) com percentual exato de afinidade.
-  * Detalhes acadêmicos completos: Duração (anos/semestres), turno, total de vagas anuais e link oficial direto para a matriz curricular na UTFPR.
-  * **Ranking de Aderência:** Panorama geral ordenado exibindo a compatibilidade do estudante com os 10 cursos ofertados no câmpus.
-  * Recursos de compartilhamento rápido e orientações sobre ingresso via SiSU e Vestibular.
+  * Detalhes acadêmicos completos (duração, turno, vagas) e link direto para a matriz curricular na UTFPR.
+  * **Ranking de Aderência:** Compatibilidade ordenada com os 10 cursos ofertados no câmpus.
 
 ### 📊 Painel Administrativo de BI (`/administracao`)
-* **KPIs Globais:** Volume total de testes finalizados, indicador de crescimento de respostas, total de escolas mapeadas e taxa de conclusão dos duelos.
-* **Mapeamento da Rede Escolar:** Ranking visual das escolas com maior volume e percentual de participação.
-* **Distribuição de Afinidade:** Gráfico/lista do fluxo de interesses da comunidade por área de conhecimento (Tecnologia, Engenharias, Licenciaturas).
+* **Autenticação Segura:** Proteção de rotas no frontend e backend via **JWT em cookies HTTP-Only** com suporte a acessos via rede local (LAN - `192.168.x.x`).
+* **KPIs & Mapeamento:** Volume de testes, taxas de conclusão e rankings visuais de participação por escolas e afinidade por cursos.
+* **Gestão de Respostas:** Tabela paginada (10 itens por página), busca rápida, filtros combinados, adição/edição manual de respostas e exclusão (unitária ou em lote).
+* **Exportação de Relatórios:**
+  * **CSV:** Download de dados tabulados com acentuação correta e cruzamento de IDs de escolas/séries.
+  * **PDF:** Geração de documento para impressão contendo a lista completa de estudantes com resolução de nomes legíveis.
 
 ---
 
@@ -43,15 +48,12 @@ utfpr-vocacional/
 ### 🖥️ Frontend
 * **Framework:** Next.js 14 (App Router & React Server Components).
 * **Estilização:** Tailwind CSS (Design System customizado para temas escuro/claro e tokens institucionais).
-* **Linguagem:** TypeScript.
-* **Comunicação:** Fetch API com roteamento dual (suporte a resoluções internas na rede Docker e externas no browser).
+* **Segurança:** Middleware do Next.js interceptando e protegendo rotas administrativas.
 
 ### ⚙️ Backend
 * **Runtime & Framework:** Node.js, Express.js.
-* **ORM:** Prisma ORM v5.
-* **Banco de Dados:** PostgreSQL 15 (Alpine).
-* **Linguagem:** TypeScript (executado via `tsx`).
-* **Algoritmo de Cálculo:** Algoritmo de ponderação por pesos relativos por perfil vocacional com ordenação dinâmica.
+* **ORM & Banco:** Prisma ORM v5 e PostgreSQL 15 (Alpine).
+* **Autenticação:** JWT (jsonwebtoken), cookie-parser, bcryptjs e suporte a CORS configurado para origens locais e LAN.
 
 ---
 
@@ -81,6 +83,8 @@ Fragmento do código
 DATABASE_URL="postgresql://postgres:postgrespassword@db:5432/teste_vocacional?schema=public"
 PORT=4000
 NODE_ENV=development
+JWT_SECRET="sua_chave_secreta_jwt"
+ADMIN_USER="admin@utfpr.edu.br"
 ```
 
 (Opcional) Crie o arquivo frontend/.env.local para personalizar as portas do servidor:
@@ -116,11 +120,15 @@ Execute o script de população automática para cadastrar os 10 cursos da UTFPR
 docker compose exec backend npx prisma db seed
 ```
 
-📍 URLs de Acesso
+📍 URLs de Acesso e Credenciais
 
     Área Principal (Estudante): http://localhost:3000
-    
+
     Painel Administrativo: http://localhost:3000/administracao
+
+        Usuário: admin@utfpr.edu.br
+
+        Senha: utfpr2026
 
     API REST Backend: http://localhost:4000
 

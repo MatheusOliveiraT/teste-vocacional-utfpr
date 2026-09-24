@@ -61,7 +61,8 @@ async function main() {
     { year: '1º ano', description: 'Ensino Médio' },
     { year: '2º ano', description: 'Ensino Médio' },
     { year: '3º ano', description: 'Ensino Médio' },
-    { year: 'Concluído', description: '3º ano Concluído' }
+    { year: '4º ano', description: 'Ensino Médio' },
+    { year: 'Concluído', description: '3º/4º ano Concluído' }
   ];
 
   for (const esc of escolaridades) {
@@ -214,7 +215,7 @@ async function main() {
 
   console.log('❓ Coletando todas as 60 opções originais e gerando 30 duelos aleatórios...');
 
-  // Lista com as 72 alternativas originais completas
+  // Lista com as 60 alternativas originais completas
   const allOptions = [
     // Ciência da Computação
     { text: 'Estudar sobre inteligência artificial', profileId: cc.id },
@@ -280,12 +281,12 @@ async function main() {
     { text: 'Coordenar a produção em fábricas de alimentos', profileId: engAlimentos.id },
     { text: 'Criar embalagens para alimentos', profileId: tecAlimentos.id },
     { text: 'Analisar a qualidade do alimento', profileId: tecAlimentos.id },
-    { text: 'Desenvolver embalagens que não poluam o meio ambiente', profileId: tecAlimentos.id },
+    { text: 'Desenvolver embalagens que não poluam o meio ambiente', profileId: engAlimentos.id },
     { text: 'Estudar produtos alimentícios existentes para melhorá-los', profileId: engAlimentos.id },
     { text: 'Conhecer quais bactérias causam intoxicação alimentar', profileId: tecAlimentos.id },
     { text: 'Saber como é o processo de fermentação', profileId: tecAlimentos.id },
     { text: 'Estudar como deixar um alimento industrializado mais saudável em sua composição', profileId: tecAlimentos.id },
-    { text: 'Saber como uma indústria produz um alimento de forma segura e higiênica', profileId: tecAlimentos.id },
+    { text: 'Saber como uma indústria produz um alimento de forma segura e higiênica', profileId: engAlimentos.id },
     { text: 'Projetar equipamentos para uma indústria de alimentos', profileId: engAlimentos.id },
 
     // IA (Aplicada & Sistemas Autônomos)
@@ -303,10 +304,10 @@ async function main() {
     { text: 'Projetar sistemas de visão computacional para orientação de veículos sem motorista', profileId: iaSistemasAutonomos.id },
   ];
 
-  // 1. Embaralha individualmente o pool de 72 opções
+  // 1. Embaralha individualmente o pool de 60 opções
   const shuffledOptions = shuffle(allOptions);
 
-  // 2. Agrupa as 72 opções de duas em duas, criando 36 duelos inéditos com opções cruzadas
+  // 2. Agrupa as 60 opções de duas em duas, criando 30 duelos inéditos com opções cruzadas
   const totalQuestions = shuffledOptions.length / 2;
 
   for (let i = 0; i < totalQuestions; i++) {

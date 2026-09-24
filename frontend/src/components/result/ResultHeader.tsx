@@ -8,7 +8,7 @@ export function ResultHeader() {
         Diagnóstico Vocacional Concluído
       </h1>
       <p className="font-body-md text-body-md text-text-muted max-w-xl">
-        Com base nas suas 36 escolhas pareadas, calculamos sua afinidade com
+        Com base nas suas 30 escolhas pareadas, calculamos sua afinidade com
         todas as graduações públicas da UTFPR.
       </p>
     </section>

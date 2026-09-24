@@ -68,8 +68,8 @@ export function DuelScreen() {
   }, []);
 
   const totalQuestions = questions.length;
-  // Limite dinâmico de 33% do tamanho da lista de questões (Ex: 30 * 0.33 = 9.9 -> 10)
-  const maxSkips = Math.floor(totalQuestions * 0.3333) || 1;
+  // Arredonda para o inteiro mais próximo (Ex: 30 * 0.3333 = 9.999 -> 10)
+  const maxSkips = Math.round(totalQuestions * (1 / 3)) || 1;
   const canSkip = skipsCount < maxSkips;
 
   const currentQuestion = questions[questionIdx];

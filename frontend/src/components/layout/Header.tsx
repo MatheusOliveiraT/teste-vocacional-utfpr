@@ -9,7 +9,7 @@ import { NAV_LINKS, VESTIBULAR_LINK } from "@/data/navigation";
 
 /**
  * Cabeçalho fixo com logo, navegação principal, atalho para Vestibular & SISU,
- * e ações de autenticação (Login / Logout) com navegação administrativa.
+ * e ações de autenticação (Login / Painel Adm / Logout) com navegação administrativa.
  */
 export function Header() {
   const pathname = usePathname();
@@ -121,25 +121,44 @@ export function Header() {
             {VESTIBULAR_LINK.label}
           </Link>
 
-          {/* Renderização do Botão de Login / Logout */}
+          {/* Renderização condicional para usuários autenticados vs não autenticados */}
           {hasMounted && isAuthenticated ? (
-            <button
-              type="button"
-              onClick={handleLogout}
-              disabled={isLoggingOut}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-status-error/30 bg-status-error/10 text-status-error hover:bg-status-error/20 font-label-md text-label-md transition-all cursor-pointer disabled:opacity-50 shrink-0 whitespace-nowrap"
-              title="Sair do painel administrativo"
-            >
-              <Icon name="logout" className="text-[18px]" />
-              <span className="font-semibold">{isLoggingOut ? "Saindo..." : "Sair"}</span>
-            </button>
+            <>
+              {/* Link de atalho direto para o Painel Administrativo */}
+              <Link
+                href="/administracao"
+                className={cn(
+                  "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-label-md text-label-md transition-all shrink-0 whitespace-nowrap font-semibold border",
+                  pathname.startsWith("/administracao")
+                    ? "bg-primary-container text-surface-base border-primary-container"
+                    : "border-primary-container/40 bg-primary-container/10 text-primary-container hover:bg-primary-container hover:text-surface-base"
+                )}
+                title="Ir para o Painel Administrativo"
+              >
+                <Icon name="dashboard" className="text-[18px]" />
+                <span>Painel Adm</span>
+              </Link>
+
+              {/* Botão de Logout */}
+              <button
+                type="button"
+                onClick={handleLogout}
+                disabled={isLoggingOut}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-status-error/30 bg-status-error/10 text-status-error hover:bg-status-error/20 font-label-md text-label-md transition-all cursor-pointer disabled:opacity-50 shrink-0 whitespace-nowrap"
+                title="Sair do painel administrativo"
+              >
+                <Icon name="logout" className="text-[18px]" />
+                <span className="font-semibold">{isLoggingOut ? "Saindo..." : "Sair"}</span>
+              </button>
+            </>
           ) : (
+            /* Botão para ir para a tela de Login quando não autenticado */
             <Link
               href="/administracao/login"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-primary-container/40 bg-primary-container/10 text-primary-container hover:bg-primary-container hover:text-surface-base font-label-md text-label-md transition-all shrink-0 whitespace-nowrap font-semibold"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border-subtle bg-surface-track text-text-high-contrast hover:border-primary-container hover:text-primary-container font-label-md text-label-md transition-all shrink-0 whitespace-nowrap font-semibold"
               title="Acesso administrativo"
             >
-              <Icon name="lock" className="text-[18px]" />
+              <Icon name="lock" className="text-[18px] text-text-muted" />
               <span>Painel Adm</span>
             </Link>
           )}

@@ -15,13 +15,12 @@ export function KpiGrid({ kpis }: { kpis: AdminKpis }) {
           <span className="font-headline-lg text-headline-lg text-text-high-contrast font-bold tracking-tight">
             {totalResponses.value}
           </span>
-          <span className="inline-flex items-center text-xs font-semibold text-primary-container">
-            <Icon name="trending_up" className="text-[14px]" />
-            {totalResponses.trend}
+          <span className="font-body-sm text-body-sm text-text-muted">
+            respostas
           </span>
         </div>
         <p className="font-body-sm text-body-sm text-text-muted">
-          Volume acumulado nos últimos 30 dias
+          Respostas registradas durante a Feira de Profissões
         </p>
       </KpiCard>
 

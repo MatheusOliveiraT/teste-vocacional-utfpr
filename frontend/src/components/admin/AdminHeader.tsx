@@ -47,35 +47,46 @@ export function AdminHeader({
     }
   };
 
-  // Função para gerar o Relatório PDF com os nomes reais das escolas e séries
+  // Função para gerar o Relatório PDF com os nomes reais convertidos de escolas e séries
   const handlePrintPDF = async () => {
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
-      // 1. Busca a lista completa de estudantes
-      const response = await fetch(`${apiUrl}/api/test/results`, {
-        method: "GET",
-        credentials: "include",
-      });
+      // Busca simultaneamente os resultados e o dicionário de opções (escolas e séries)
+      const [resultsRes, optionsRes] = await Promise.all([
+        fetch(`${apiUrl}/api/test/results`, {
+          method: "GET",
+          credentials: "include",
+        }),
+        fetch(`${apiUrl}/api/test/options`, {
+          method: "GET",
+          credentials: "include",
+        }),
+      ]);
 
-      if (!response.ok) throw new Error("Erro ao buscar dados para impressão.");
+      if (!resultsRes.ok) throw new Error("Erro ao buscar resultados para impressão.");
 
-      const data = await response.json();
-      const allStudents = data.results || [];
+      const resultsData = await resultsRes.json();
+      const optionsData = optionsRes.ok ? await optionsRes.json() : { schools: [], schoolLevels: [] };
 
-      // 2. Mapeamento auxiliar de IDs para Rótulos (usando filterOptions do data)
+      const allStudents = resultsData.results || [];
+
+      // Monta os mapas de conversão usando a resposta real de /api/test/options
       const schoolMap = new Map(
-        data.filterOptions?.schools?.map((s: any) => [s.value, s.label]) || []
+        (optionsData.schools || []).map((s: any) => [s.id, s.name])
       );
       const gradeMap = new Map(
-        data.filterOptions?.grades?.map((g: any) => [g.value, g.label]) || []
+        (optionsData.schoolLevels || []).map((l: any) => [
+          l.id,
+          `${l.year} — ${l.description}`,
+        ])
       );
 
-      // Função auxiliar para resolver ID -> Nome Legível
+      // Funções auxiliares para resolução dos nomes
       const resolveSchool = (idOrName: string) => schoolMap.get(idOrName) || idOrName || "—";
       const resolveGrade = (idOrName: string) => gradeMap.get(idOrName) || idOrName || "—";
 
-      // 3. Cria a janela temporária para impressão
+      // Janela temporária formatada para impressão do documento PDF
       const printWindow = window.open("", "_blank");
       if (!printWindow) {
         alert("Por favor, permita pop-ups para gerar o relatório em PDF.");
@@ -157,7 +168,7 @@ export function AdminHeader({
         </div>
         <div className="flex items-center gap-2 text-text-muted font-body-sm text-body-sm">
           <Icon name="calendar_today" className="text-[18px]" />
-          <span>Feira de Profissões 2026</span>
+          <span>Feira de Profissões</span>
         </div>
       </div>
 
