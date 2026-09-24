@@ -5,7 +5,7 @@ export interface NavLink {
 
 export const NAV_LINKS: NavLink[] = [
   { label: "Início", href: "/" },
-  { label: "Questionário", href: "/identificacao" },
+  { label: "Começar", href: "/identificacao" },
   { label: "Cursos", href: "/cursos" },
   { label: "Sobre o Câmpus", href: "https://www.utfpr.edu.br/campus/campomourao" },
 ];

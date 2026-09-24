@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState, useEffect } from "react";
+import { Icon } from "@/components/ui/Icon";
 import { AdminHeader } from "@/components/admin/AdminHeader";
 import { KpiGrid } from "@/components/admin/KpiGrid";
 import { AnalyticsSection } from "@/components/admin/AnalyticsSection";
@@ -57,7 +58,29 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
+  // Estado para a mensagem temporária de sucesso (Toast)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  // Timer para limpar a mensagem automaticamente após 4 segundos
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => {
+        setSuccessMessage(null);
+      }, 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage]);
+  // Estado do modal de confirmação
+  const [confirmModal, setConfirmModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => Promise<void>;
+  }>({
+    isOpen: false,
+    title: "",
+    message: "",
+    onConfirm: async () => {},
+  });
   // 1. Defina o número de itens por página e o estado da página atual
   const PAGE_SIZE = 10; // Exibe 10 alunos por página
   const [currentPage, setCurrentPage] = useState(1);
@@ -136,7 +159,8 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
     }
   }
 
-  async function handleDeleteOne(id: string) {
+  // Execução real da exclusão individual
+  async function executeDeleteOne(id: string) {
     const previousStudents = data.students;
     setData((prev) => ({
       ...prev,
@@ -150,6 +174,7 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
 
     try {
       await deleteStudentRequest(id);
+      setSuccessMessage("Registro excluído com sucesso!");
     } catch (err) {
       setData((prev) => ({ ...prev, students: previousStudents }));
       setError(
@@ -158,19 +183,39 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
     }
   }
 
-  async function handleDeleteSelected() {
+  // Handler do botão de exclusão individual (Abre o Modal)
+  function handleDeleteOne(id: string) {
+    const student = data.students.find((s) => s.id === id);
+    const name = student?.fullName ? `"${student.fullName}"` : "este registro";
+
+    setConfirmModal({
+      isOpen: true,
+      title: "Excluir Registro",
+      message: `Tem certeza que deseja excluir ${name}? Esta ação não poderá ser desfeita.`,
+      onConfirm: async () => {
+        await executeDeleteOne(id);
+      },
+    });
+  }
+
+  // Execução real da exclusão em massa
+  async function executeDeleteSelected() {
     const idsToDelete = Array.from(selectedIds);
     if (idsToDelete.length === 0) return;
-
+    const count = idsToDelete.length;
     const previousStudents = data.students;
     setData((prev) => ({
       ...prev,
       students: prev.students.filter((s) => !selectedIds.has(s.id)),
     }));
     setSelectedIds(new Set());
-
     try {
       await deleteStudentsRequest(idsToDelete);
+      setSuccessMessage(
+        count > 1
+          ? `${count} registros excluídos com sucesso!`
+          : "Registro excluído com sucesso!"
+      );
     } catch (err) {
       setData((prev) => ({ ...prev, students: previousStudents }));
       setError(
@@ -179,6 +224,21 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
           : "Falha ao excluir os registros selecionados."
       );
     }
+  }
+
+  // Handler do botão de exclusão em massa (Abre o Modal)
+  function handleDeleteSelected() {
+    const count = selectedIds.size;
+    if (count === 0) return;
+
+    setConfirmModal({
+      isOpen: true,
+      title: "Excluir Registros Selecionados",
+      message: `Tem certeza que deseja excluir os ${count} registros selecionados? Esta ação não poderá ser desfeita.`,
+      onConfirm: async () => {
+        await executeDeleteSelected();
+      },
+    });
   }
 
   async function handleSaveModal(updated: StudentModalSaveInput) {
@@ -273,7 +333,6 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
 	    onDeleteSelected={handleDeleteSelected}
 	  />
 	</section>
-
       <StudentModal
         mode={modal.mode}
         student={modal.student}
@@ -282,6 +341,61 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
         onClose={() => setModal({ mode: null, student: null })}
         onSave={handleSaveModal}
       />
+      {/* Toast / Alerta Flutuante de Sucesso */}
+      {successMessage && (
+        <div className="fixed bottom-5 right-5 z-50 flex items-center gap-3 px-4 py-3 rounded-xl bg-emerald-500/15 border border-emerald-500/40 text-emerald-400 shadow-2xl backdrop-blur-md animate-fadeIn">
+          <Icon name="check_circle" className="text-xl text-emerald-400" />
+          <span className="font-label-md font-semibold">{successMessage}</span>
+          <button
+            type="button"
+            onClick={() => setSuccessMessage(null)}
+            className="ml-2 text-emerald-400/60 hover:text-emerald-400 transition-colors cursor-pointer"
+          >
+            <Icon name="close" className="text-lg" />
+          </button>
+        </div>
+      )}
+      {/* Modal de Confirmação de Exclusão */}
+      {confirmModal.isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
+          <div className="bg-surface-card border border-border-subtle rounded-2xl max-w-md w-full p-6 shadow-2xl flex flex-col gap-4">
+            <div className="flex items-center gap-3 text-status-error">
+              <div className="w-10 h-10 rounded-full bg-status-error/10 flex items-center justify-center shrink-0">
+                <Icon name="warning" className="text-2xl text-status-error" />
+              </div>
+              <h3 className="font-headline-sm text-lg font-bold text-text-high-contrast">
+                {confirmModal.title}
+              </h3>
+            </div>
+
+            <p className="font-body-md text-text-muted">
+              {confirmModal.message}
+            </p>
+
+            <div className="flex items-center justify-end gap-3 pt-2 border-t border-border-subtle">
+              <button
+                type="button"
+                onClick={() => setConfirmModal((prev) => ({ ...prev, isOpen: false }))}
+                className="px-4 py-2 rounded-xl border border-border-subtle bg-surface-track hover:bg-surface-bright text-text-high-contrast font-label-md font-semibold transition-all cursor-pointer"
+              >
+                Cancelar
+              </button>
+
+              <button
+                type="button"
+                onClick={async () => {
+                  const action = confirmModal.onConfirm;
+                  setConfirmModal((prev) => ({ ...prev, isOpen: false }));
+                  await action();
+                }}
+                className="px-4 py-2 rounded-xl bg-status-error text-white font-label-md font-bold hover:bg-status-error/90 transition-all cursor-pointer shadow-md"
+              >
+                Sim, Excluir
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

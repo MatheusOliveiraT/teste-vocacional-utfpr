@@ -1,4 +1,4 @@
-# 🎓 Sistema Vocacional UTFPR-CM
+# 🎓 Sistema Vocacional & Quiz UTFPR-CM
 
 ![License: CC0-1.0](https://img.shields.io/badge/License-CC0_1.0-lightgrey.svg)
 ![Next.js](https://img.shields.io/badge/Frontend-Next.js_14-black)
@@ -6,9 +6,9 @@
 ![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL_15-blue)
 ![Docker](https://img.shields.io/badge/Container-Docker_Compose-blue)
 
-Uma aplicação web moderna, responsiva e performática desenvolvida para auxiliar estudantes do ensino médio e comunidade na escolha profissional, mapeando afinidades vocacionais com os **10 cursos de graduação ofertados pela UTFPR — Câmpus Campo Mourão**.
+Uma aplicação web moderna, responsiva e performática desenvolvida para auxiliar estudantes do ensino médio e a comunidade na Feira de Profissões, mapeando afinidades vocacionais com os **10 cursos de graduação ofertados pela UTFPR — Câmpus Campo Mourão** e testando conhecimentos institucionais.
 
-O sistema oferece uma experiência gamificada de **duelos de preferências**, gera relatórios de compatibilidade e conta com um **painel administrativo protegido com métricas e exportações de dados**.
+O sistema oferece uma experiência gamificada de **duelos de preferências**, um **quiz interativo de conhecimentos sobre a UTFPR**, relatórios visuais de compatibilidade e um **painel administrativo protegido com métricas e exportações de dados**.
 
 ---
 
@@ -16,22 +16,28 @@ O sistema oferece uma experiência gamificada de **duelos de preferências**, ge
 
 ### 🌐 Área do Estudante
 * **Identificação Personalizada:** Coleta simplificada de dados (Nome, Série e Escola) com seleção unificada das instituições parceiras de Campo Mourão e região.
-* **Quiz Gamificado (Duelos):** 
-  * 30 perguntas/duelos aleatorizados dinamicamente.
-  * Navegação fluida por clique ou atalhos de teclado (`A`, `B`, setas direcionais, e `S` ou seta para baixo para pular).
-  * **Botão de Pular Questão:** Destaque visual limitado a no máximo **33% do total de questões** (até 10 pulos).
+* **Duelos Vocacionais (Pareamento Ponderado):**
+  * 30 duelos de preferências aleatorizados dinamicamente.
+  * Navegação por clique ou atalhos de teclado (`A`, `B`, setas e `S` para pular).
+  * **Pulo Limitado:** Destaque visual limitado a **33% das questões** (até 10 pulos).
+* **Quiz de Conhecimentos UTFPR (`/quiz-utfpr`):**
+  * Tela inicial de apresentação com informações do quiz.
+  * Banco de dados com 39 questões sobre a história da UTFPR, cursos, modalidade gratuita, vestibular/SiSU e novos cursos em IA.
+  * **Sorteio Dinâmico:** Seleção aleatória de **10 perguntas por rodada**.
+  * **Temporizador Regressivo:** Limite de **30 segundos por questão** com barra de progresso visual.
+  * **Seleção Silenciosa:** Destaque neutro para uso na Feira de Profissões (evita cópia entre colegas ao lado).
 * **Resultado em Tempo Real:**
-  * Apresentação do curso ideal (Top Match) com percentual exato de afinidade.
-  * Detalhes acadêmicos completos (duração, turno, vagas) e link direto para a matriz curricular na UTFPR.
-  * **Ranking de Aderência:** Compatibilidade ordenada com os 10 cursos ofertados no câmpus.
+  * Apresentação do curso ideal (Top Match) com percentual de compatibilidade.
+  * Detalhes acadêmicos (duração, turno, vagas) e atalhos para a matriz curricular.
+  * **Encaminhamento Direto:** Botão em destaque para realizar o Quiz de Conhecimentos ao finalizar o Teste Vocacional.
 
 ### 📊 Painel Administrativo de BI (`/administracao`)
-* **Autenticação Segura:** Proteção de rotas no frontend e backend via **JWT em cookies HTTP-Only** com suporte a acessos via rede local (LAN - `192.168.x.x`).
+* **Autenticação Segura:** Proteção de rotas via **JWT em cookies HTTP-Only** com suporte a acessos via rede local (LAN - `192.168.x.x`).
 * **KPIs & Mapeamento:** Volume de testes, taxas de conclusão e rankings visuais de participação por escolas e afinidade por cursos.
-* **Gestão de Respostas:** Tabela paginada (10 itens por página), busca rápida, filtros combinados, adição/edição manual de respostas e exclusão (unitária ou em lote).
+* **Gestão de Respostas:** Tabela paginada (10 itens/página), busca rápida, filtros combinados, criação/edição manual de registros, **modais de confirmação de exclusão** (individual e em massa) e **notificações temporárias (toasts) de sucesso**.
 * **Exportação de Relatórios:**
-  * **CSV:** Download de dados tabulados com acentuação correta e cruzamento de IDs de escolas/séries.
-  * **PDF:** Geração de documento para impressão contendo a lista completa de estudantes com resolução de nomes legíveis.
+  * **CSV:** Download tabulado com acentuação correta e cruzamento de IDs de escolas/séries.
+  * **PDF:** Documento de impressão contendo a lista completa de estudantes com resolução dos nomes legíveis das instituições.
 
 ---
 
@@ -127,6 +133,8 @@ docker compose exec backend npx prisma db seed
 📍 URLs de Acesso e Credenciais
 
     Área Principal (Estudante): http://localhost:3000
+
+    Quiz de Conhecimentos UTFPR: http://localhost:3000/quiz-utfpr
 
     Painel Administrativo: http://localhost:3000/administracao
 

@@ -141,27 +141,21 @@ export function WinnerCard() {
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-space-sm">
               <Button
                 as="link"
+                href="/quiz-utfpr"
+                icon="quiz"
+              >
+                Testar Conhecimentos sobre a UTFPR
+              </Button>
+              <Button
+                as="link"
                 href={
                   winningProfile?.curriculumUrl ||
                   "https://www.utfpr.edu.br/campomourao/cursos/graduacao"
                 }
+                variant="secondary"
                 icon="open_in_new"
               >
                 Ver Matriz Curricular do Curso
-              </Button>
-              <Button
-                as="button"
-                variant="secondary"
-                icon="share"
-                onClick={() => {
-                  if (typeof navigator !== "undefined") {
-                    navigator.clipboard
-                      ?.writeText(window.location.href)
-                      .then(() => alert("Link do resultado copiado com sucesso!"));
-                  }
-                }}
-              >
-                Compartilhar Resultado
               </Button>
             </div>
             <a
