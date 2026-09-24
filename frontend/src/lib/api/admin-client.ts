@@ -22,7 +22,10 @@ async function parseOrThrow<T>(response: Response): Promise<T> {
 }
 
 export async function fetchAdminDashboard(): Promise<AdminDashboardData> {
-  const response = await fetch("/api/admin", { cache: "no-store" });
+  const response = await fetch("/api/admin", {
+    cache: "no-store",
+    credentials: "include", // Garante o envio dos cookies de autenticação
+  });
   return parseOrThrow<AdminDashboardData>(response);
 }
 
@@ -32,6 +35,7 @@ export async function saveStudent(
   const response = await fetch("/api/admin/students", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
+    credentials: "include", // Garante o envio dos cookies de autenticação
     body: JSON.stringify(input),
   });
   return parseOrThrow<AdminStudent>(response);
@@ -40,6 +44,7 @@ export async function saveStudent(
 export async function deleteStudentRequest(id: string): Promise<void> {
   const response = await fetch(`/api/admin/students/${id}`, {
     method: "DELETE",
+    credentials: "include", // Garante o envio dos cookies de autenticação
   });
   await parseOrThrow<{ ok: true }>(response);
 }
@@ -48,6 +53,7 @@ export async function deleteStudentsRequest(ids: string[]): Promise<void> {
   const response = await fetch("/api/admin/students/bulk-delete", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
+    credentials: "include", // Garante o envio dos cookies de autenticação
     body: JSON.stringify({ ids }),
   });
   await parseOrThrow<{ ok: true }>(response);

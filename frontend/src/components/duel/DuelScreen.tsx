@@ -8,6 +8,7 @@ import { DuelOptionCard } from "@/components/duel/DuelOptionCard";
 import { OrDivider } from "@/components/duel/OrDivider";
 import { DuelContextStrip } from "@/components/duel/DuelContextStrip";
 import { DuelFooterNav } from "@/components/duel/DuelFooterNav";
+import { Icon } from "@/components/ui/Icon";
 
 export interface DuelOption {
   id: string;
@@ -35,6 +36,9 @@ export function DuelScreen() {
   const [questionIdx, setQuestionIdx] = useState(0);
   const [selection, setSelection] = useState<Selection>(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
+
+  // Controle de contagem de pulos efetuados
+  const [skipsCount, setSkipsCount] = useState(0);
 
   // Armazena o mapeamento das respostas selecionadas: [questionId]: optionId
   const [answers, setAnswers] = useState<Record<string, string>>({});
@@ -64,9 +68,57 @@ export function DuelScreen() {
   }, []);
 
   const totalQuestions = questions.length;
+  // Limite dinâmico de 33% do tamanho da lista de questões (Ex: 30 * 0.33 = 9.9 -> 10)
+  const maxSkips = Math.floor(totalQuestions * 0.3333) || 1;
+  const canSkip = skipsCount < maxSkips;
+
   const currentQuestion = questions[questionIdx];
   const percent = totalQuestions > 0 ? ((questionIdx + 1) / totalQuestions) * 100 : 0;
   const isLast = questionIdx === totalQuestions - 1;
+
+  // Função auxiliar centralizada para finalização do teste
+  const submitTest = useCallback(
+    async (finalAnswers: Record<string, string>) => {
+      try {
+        setSubmitting(true);
+
+        const fullName = sessionStorage.getItem("utfpr_voc_name") || "";
+        const schoolLevel = sessionStorage.getItem("utfpr_voc_grade") || "";
+        const schoolName = sessionStorage.getItem("utfpr_voc_school") || "";
+
+        const selectedOptionIds = Object.values(finalAnswers);
+
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+        const response = await fetch(`${apiUrl}/api/test/submit`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            fullName,
+            schoolLevel,
+            schoolName,
+            selectedOptionIds,
+          }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || "Erro ao processar e salvar o resultado.");
+        }
+
+        const resultData = await response.json();
+        localStorage.setItem("utfpr_voc_result", JSON.stringify(resultData));
+
+        router.push("/resultado");
+      } catch (err: any) {
+        setError(err.message || "Ocorreu um erro ao enviar seu teste.");
+        setIsTransitioning(false);
+        setSubmitting(false);
+      }
+    },
+    [router]
+  );
 
   // 2. Manipulação da Seleção e Submissão para o Backend
   const handleSelect = useCallback(
@@ -78,7 +130,6 @@ export function DuelScreen() {
 
       const selectedOption = key === "A" ? currentQuestion.options[0] : currentQuestion.options[1];
 
-      // Atualiza o dicionário de respostas
       const updatedAnswers = {
         ...answers,
         [currentQuestion.id]: selectedOption.id,
@@ -87,47 +138,7 @@ export function DuelScreen() {
 
       setTimeout(async () => {
         if (isLast) {
-          try {
-            setSubmitting(true);
-
-            // Recupera os dados do estudante gravados na primeira etapa (IdentificationForm)
-            const fullName = sessionStorage.getItem("utfpr_voc_name") || "";
-            const schoolLevel = sessionStorage.getItem("utfpr_voc_grade") || "";
-            const schoolName = sessionStorage.getItem("utfpr_voc_school") || "";
-
-            // Extrai a lista simples de IDs das opções escolhidas
-            const selectedOptionIds = Object.values(updatedAnswers);
-
-            const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
-            const response = await fetch(`${apiUrl}/api/test/submit`, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                fullName,
-                schoolLevel,
-                schoolName,
-                selectedOptionIds,
-              }),
-            });
-
-            if (!response.ok) {
-              const errorData = await response.json();
-              throw new Error(errorData.error || "Erro ao processar e salvar o resultado.");
-            }
-
-            const resultData = await response.json();
-
-            // Salva o resultado retornado do banco no localStorage para a tela /resultado
-            localStorage.setItem("utfpr_voc_result", JSON.stringify(resultData));
-
-            router.push("/resultado");
-          } catch (err: any) {
-            setError(err.message || "Ocorreu um erro ao enviar seu teste.");
-            setIsTransitioning(false);
-            setSubmitting(false);
-          }
+          await submitTest(updatedAnswers);
           return;
         }
 
@@ -136,8 +147,24 @@ export function DuelScreen() {
         setIsTransitioning(false);
       }, 650);
     },
-    [isTransitioning, currentQuestion, isLast, answers, submitting, router]
+    [isTransitioning, currentQuestion, submitting, isLast, answers, submitTest]
   );
+
+  // 3. Função para Pular Questão (com limite de 33%)
+  const handleSkip = useCallback(() => {
+    if (isTransitioning || submitting || !canSkip) return;
+
+    setSkipsCount((prev) => prev + 1);
+
+    if (isLast) {
+      submitTest(answers);
+      return;
+    }
+
+    setQuestionIdx((idx) => idx + 1);
+    setSelection(null);
+    setIsTransitioning(false);
+  }, [isTransitioning, submitting, canSkip, isLast, answers, submitTest]);
 
   const handlePrev = useCallback(() => {
     if (questionIdx === 0 || submitting) return;
@@ -146,7 +173,7 @@ export function DuelScreen() {
     setIsTransitioning(false);
   }, [questionIdx, submitting]);
 
-  // 3. Atalhos de Teclado
+  // 4. Atalhos de Teclado
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
       const target = (e.target as HTMLElement)?.tagName;
@@ -159,12 +186,15 @@ export function DuelScreen() {
       } else if (key === "B" || e.key === "ArrowRight") {
         e.preventDefault();
         handleSelect("B");
+      } else if (key === "S" || e.key === "ArrowDown") {
+        e.preventDefault();
+        handleSkip();
       }
     }
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [handleSelect]);
+  }, [handleSelect, handleSkip]);
 
   // Tela de Carregamento Inicial ou de Submissão
   if (loading || submitting) {
@@ -252,6 +282,27 @@ export function DuelScreen() {
         </div>
 
         <DuelContextStrip label="Selecione usando o clique ou as teclas A / B / Setas do teclado" />
+
+        {/* Botão de Pular Questão com Limite do Pulos (33%) */}
+        <div className="flex flex-col items-center gap-1.5 mt-6">
+          <button
+            type="button"
+            onClick={handleSkip}
+            disabled={!canSkip}
+            className={`inline-flex items-center gap-2 px-6 py-3 rounded-xl font-label-lg text-label-lg font-bold transition-all shadow-md ${
+              canSkip
+                ? "bg-primary-container text-surface-base hover:bg-brand-yellow-hover hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+                : "bg-surface-card text-text-muted opacity-50 cursor-not-allowed border border-border-subtle shadow-none"
+            }`}
+          >
+            <span>
+              {canSkip
+                ? `Pular esta questão (${maxSkips - skipsCount} restantes)`
+                : "Limite de pulos atingido"}
+            </span>
+            <Icon name="skip_next" className="text-[22px] font-bold" />
+          </button>
+        </div>
 
         <DuelFooterNav
           percent={percent}

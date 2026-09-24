@@ -3,7 +3,7 @@ import { CampusImage, Highlight } from "@/types";
 export const HERO_HIGHLIGHTS: Highlight[] = [
   {
     icon: "fact_check",
-    title: "36 Perguntas Curtas",
+    title: "30 Perguntas Curtas",
     subtitle: "Rápido e intuitivo",
   },
   {

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Icon } from "@/components/ui/Icon";
 
 export interface AdminHeaderProps {
@@ -13,6 +14,135 @@ export function AdminHeader({
   onRefresh,
   isRefreshing,
 }: AdminHeaderProps) {
+  const [isExportingCsv, setIsExportingCsv] = useState(false);
+
+  // Função para baixar o arquivo CSV diretamente da API Express (com token/cookie de autenticação)
+  const handleExportCSV = async () => {
+    try {
+      setIsExportingCsv(true);
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+      
+      const response = await fetch(`${apiUrl}/api/dashboard/export/csv`, {
+        method: "GET",
+        credentials: "include", // Envia o cookie HttpOnly de autenticação (admin_token)
+      });
+
+      if (!response.ok) throw new Error("Erro ao baixar o relatório em CSV");
+
+      // Transforma a resposta em um Blob e força o download no navegador
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `relatorio_utfpr_vocacional_${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error(error);
+      alert("Não foi possível exportar o arquivo CSV.");
+    } finally {
+      setIsExportingCsv(false);
+    }
+  };
+
+  // Função para gerar o Relatório PDF com os nomes reais das escolas e séries
+  const handlePrintPDF = async () => {
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+
+      // 1. Busca a lista completa de estudantes
+      const response = await fetch(`${apiUrl}/api/test/results`, {
+        method: "GET",
+        credentials: "include",
+      });
+
+      if (!response.ok) throw new Error("Erro ao buscar dados para impressão.");
+
+      const data = await response.json();
+      const allStudents = data.results || [];
+
+      // 2. Mapeamento auxiliar de IDs para Rótulos (usando filterOptions do data)
+      const schoolMap = new Map(
+        data.filterOptions?.schools?.map((s: any) => [s.value, s.label]) || []
+      );
+      const gradeMap = new Map(
+        data.filterOptions?.grades?.map((g: any) => [g.value, g.label]) || []
+      );
+
+      // Função auxiliar para resolver ID -> Nome Legível
+      const resolveSchool = (idOrName: string) => schoolMap.get(idOrName) || idOrName || "—";
+      const resolveGrade = (idOrName: string) => gradeMap.get(idOrName) || idOrName || "—";
+
+      // 3. Cria a janela temporária para impressão
+      const printWindow = window.open("", "_blank");
+      if (!printWindow) {
+        alert("Por favor, permita pop-ups para gerar o relatório em PDF.");
+        return;
+      }
+
+      const rowsHtml = allStudents
+        .map(
+          (s: any, idx: number) => `
+          <tr style="border-bottom: 1px solid #ddd; font-size: 12px;">
+            <td style="padding: 6px;">${idx + 1}</td>
+            <td style="padding: 6px; font-weight: bold;">${s.fullName || "—"}</td>
+            <td style="padding: 6px;">${resolveSchool(s.schoolName)}</td>
+            <td style="padding: 6px;">${resolveGrade(s.schoolLevel)}</td>
+            <td style="padding: 6px;">${s.profile?.name || "—"}</td>
+          </tr>`
+        )
+        .join("");
+
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <title>Relatório Completo - Teste Vocacional UTFPR</title>
+            <style>
+              body { font-family: sans-serif; margin: 20px; color: #111; }
+              h1 { font-size: 18px; margin-bottom: 4px; }
+              p { font-size: 12px; color: #555; margin-top: 0; }
+              table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+              th { background-color: #f2f2f2; text-align: left; padding: 8px; font-size: 11px; text-transform: uppercase; border-bottom: 2px solid #ccc; }
+              @page { size: A4 portrait; margin: 15mm; }
+            </style>
+          </head>
+          <body>
+            <h1>UTFPR Câmpus Campo Mourão — Relatório Geral de Estudantes</h1>
+            <p>Gerado em: ${new Date().toLocaleDateString("pt-BR")} às ${new Date().toLocaleTimeString("pt-BR")} | Total de registros: ${allStudents.length}</p>
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Nome do Aluno</th>
+                  <th>Escola</th>
+                  <th>Série / Nível</th>
+                  <th>Curso Indicado</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rowsHtml}
+              </tbody>
+            </table>
+          </body>
+        </html>
+      `);
+
+      printWindow.document.close();
+      printWindow.focus();
+
+      setTimeout(() => {
+        printWindow.print();
+        printWindow.close();
+      }, 300);
+    } catch (error) {
+      console.error("Erro ao gerar PDF:", error);
+      window.print();
+    }
+  };
+
   return (
     <header className="flex flex-col gap-space-md">
       <div className="flex flex-wrap items-center justify-between gap-space-sm">
@@ -58,23 +188,30 @@ export function AdminHeader({
             />
             <span>{isRefreshing ? "Atualizando..." : "Atualizar Dados"}</span>
           </button>
-          <button
-            type="button"
-            className="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-lg bg-surface-card hover:bg-surface-track text-text-high-contrast font-label-md text-label-md transition-all shadow-sm"
-          >
-            <Icon name="download" className="text-[18px] text-text-muted" />
-            <span>Exportar CSV</span>
-          </button>
-          <button
-            type="button"
-            className="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-lg bg-surface-card hover:bg-surface-track text-text-high-contrast font-label-md text-label-md transition-all shadow-sm"
-          >
-            <Icon
-              name="picture_as_pdf"
-              className="text-[18px] text-text-muted"
-            />
-            <span>Relatório PDF</span>
-          </button>
+	  <button
+        type="button"
+        onClick={handleExportCSV}
+        disabled={isExportingCsv}
+        className="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-lg bg-surface-card hover:bg-surface-track text-text-high-contrast font-label-md text-label-md transition-all shadow-sm disabled:opacity-50"
+      >
+        <Icon
+          name={isExportingCsv ? "sync" : "download"}
+          className={`text-[18px] text-text-muted ${isExportingCsv ? "animate-spin" : ""}`}
+        />
+        <span>{isExportingCsv ? "Exportando..." : "Exportar CSV"}</span>
+      </button>
+
+      <button
+        type="button"
+        onClick={handlePrintPDF}
+        className="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-lg bg-surface-card hover:bg-surface-track text-text-high-contrast font-label-md text-label-md transition-all shadow-sm"
+      >
+        <Icon
+          name="picture_as_pdf"
+          className="text-[18px] text-text-muted"
+        />
+        <span>Relatório PDF</span>
+      </button>
           <button
             type="button"
             onClick={onNewResponse}

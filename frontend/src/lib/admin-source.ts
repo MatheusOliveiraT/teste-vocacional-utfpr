@@ -28,15 +28,6 @@ import {
  * -----------------------------------------------------------------------
  */
 
-const BAR_COLOR_CYCLE = [
-  "bg-primary-container",
-  "bg-brand-yellow-hover",
-  "bg-primary-fixed-dim",
-  "bg-primary",
-  "bg-secondary-container",
-  "bg-text-muted/30",
-];
-
 function buildNameMap(items: { id: string; name: string }[]): Map<string, string> {
   return new Map(items.map((item) => [item.id, item.name]));
 }
@@ -51,6 +42,10 @@ function resolveLabel(idOrRaw: string | undefined, labels: Map<string, string>) 
   return labels.get(idOrRaw) ?? idOrRaw;
 }
 
+const BAR_COLOR_CYCLE = [
+  "bg-primary-container",
+];
+
 function toBreakdown(
   items: { label: string; count: number; percentage: number }[],
   unitLabel: "respostas" | "alunos"
@@ -58,7 +53,8 @@ function toBreakdown(
   return items.map((item, index) => ({
     label: item.label,
     value: `${item.count} ${unitLabel} (${item.percentage}%)`,
-    percent: item.percentage,
+    // Mantém a porcentagem real, garantindo no mínimo 3% para percentuais pequenos ficarem bem visíveis
+    percent: Math.max(item.percentage, 3),
     barColorClass: BAR_COLOR_CYCLE[index % BAR_COLOR_CYCLE.length],
     emphasized: index === 0,
   }));

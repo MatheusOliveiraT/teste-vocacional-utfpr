@@ -36,7 +36,7 @@ export function DuelOptionCard({
       className={cn(
         "group relative flex flex-col justify-between p-8 rounded-xl bg-surface-card border-2 transition-all duration-300 text-left cursor-pointer min-h-[260px] focus:outline-none focus:ring-1 focus:ring-primary-container",
         state === "selected" &&
-          "border-primary-container shadow-[0_0_35px_rgba(255,199,9,0.25)]",
+  "border-primary-container shadow-[0_0_35px_rgba(255,199,9,0.25)] scale-105 animate-pulse",
         state === "dimmed" && "opacity-40 scale-[0.98] border-border-subtle",
         state === "idle" &&
           "border-border-subtle hover:border-primary-container hover:shadow-[0_0_28px_rgba(255,199,9,0.14)] hover:-translate-y-1 focus:border-primary-container"

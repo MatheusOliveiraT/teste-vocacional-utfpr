@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { AdminHeader } from "@/components/admin/AdminHeader";
 import { KpiGrid } from "@/components/admin/KpiGrid";
 import { AnalyticsSection } from "@/components/admin/AnalyticsSection";
@@ -58,6 +58,11 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // 1. Defina o número de itens por página e o estado da página atual
+  const PAGE_SIZE = 10; // Exibe 10 alunos por página
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // 2. Primeiro declare a lista filtrada (filteredStudents)
   const filteredStudents = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
     return data.students.filter((student) => {
@@ -74,6 +79,17 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
       return matchesQuery && matchesSchool && matchesGrade && matchesCourse;
     });
   }, [data.students, query, schoolId, gradeId, courseId]);
+
+  // Resetar para a página 1 caso algum filtro (escola, série, busca) mude
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [query, schoolId, gradeId, courseId]);
+
+  // 3. Agora declare a lista paginada consumindo 'filteredStudents' já inicializado
+  const paginatedStudents = useMemo(() => {
+    const start = (currentPage - 1) * PAGE_SIZE;
+    return filteredStudents.slice(start, start + PAGE_SIZE);
+  }, [filteredStudents, currentPage]);
 
   const allChecked =
     filteredStudents.length > 0 &&
@@ -232,27 +248,31 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
         filterOptions={data.filterOptions}
       />
 
-      <section className="bg-surface-card rounded-xl shadow-sm overflow-hidden flex flex-col">
-        <StudentsTable
-          students={filteredStudents}
-          selectedIds={selectedIds}
-          allChecked={allChecked}
-          onToggleAll={toggleAll}
-          onToggleOne={toggleOne}
-          onView={(student) => setModal({ mode: "view", student })}
-          onEdit={(student) => setModal({ mode: "edit", student })}
-          onDelete={handleDeleteOne}
-        />
-        <TablePagination
-          totalCount={data.totalResponses}
-          selectedCount={selectedIds.size}
-          onSelectAll={toggleAll}
-          onExportSelected={() => {
-            /* Integração real de exportação (CSV/PDF) entraria aqui */
-          }}
-          onDeleteSelected={handleDeleteSelected}
-        />
-      </section>
+	<section className="bg-surface-card rounded-xl shadow-sm overflow-hidden flex flex-col">
+	  <StudentsTable
+	    students={paginatedStudents} // <--- Passa apenas os alunos da página atual
+	    selectedIds={selectedIds}
+	    allChecked={allChecked}
+	    onToggleAll={toggleAll}
+	    onToggleOne={toggleOne}
+	    onView={(student) => setModal({ mode: "view", student })}
+	    onEdit={(student) => setModal({ mode: "edit", student })}
+	    onDelete={handleDeleteOne}
+	  />
+	  
+	  <TablePagination
+	    currentPage={currentPage}
+	    pageSize={PAGE_SIZE}
+	    totalCount={filteredStudents.length}
+	    selectedCount={selectedIds.size}
+	    onPageChange={setCurrentPage}
+	    onSelectAll={toggleAll}
+	    onExportSelected={() => {
+	      /* Chama a função de exportação */
+	    }}
+	    onDeleteSelected={handleDeleteSelected}
+	  />
+	</section>
 
       <StudentModal
         mode={modal.mode}

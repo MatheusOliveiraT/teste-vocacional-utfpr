@@ -1,3 +1,4 @@
+import { cookies } from "next/headers";
 import {
   ExternalAdminResultInput,
   ExternalDashboardStats,
@@ -19,6 +20,29 @@ const API_BASE_URL =
     ? process.env.API_INTERNAL_URL || "http://backend:4000" // Chamadas dentro do container Docker
     : process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
+/**
+ * Obtém os cabeçalhos de autenticação apropriados dependendo de onde o código
+ * está sendo executado (servidor Node/Next.js ou navegador).
+ */
+async function getAuthHeaders(): Promise<HeadersInit> {
+  const headers: Record<string, string> = {};
+
+  if (typeof window === "undefined") {
+    // Execução no servidor (RSC/Route Handlers): encaminha o cookie 'admin_token'
+    try {
+      const cookieStore = await cookies();
+      const token = cookieStore.get("admin_token")?.value;
+      if (token) {
+        headers["Cookie"] = `admin_token=${token}`;
+      }
+    } catch {
+      // Ignora erro caso invocado em ambiente sem suporte a cookies
+    }
+  }
+
+  return headers;
+}
+
 async function parseOrThrow<T>(response: Response, path: string): Promise<T> {
   if (!response.ok) {
     const body = await response.json().catch(() => null);
@@ -30,27 +54,37 @@ async function parseOrThrow<T>(response: Response, path: string): Promise<T> {
 }
 
 async function getJson<T>(path: string): Promise<T> {
+  const authHeaders = await getAuthHeaders();
   const response = await fetch(`${API_BASE_URL}${path}`, {
-    // Dados de dashboard/respostas mudam com frequência; nunca cachear.
+    headers: { ...authHeaders },
     cache: "no-store",
+    credentials: "include",
   });
   return parseOrThrow<T>(response, path);
 }
 
 async function postJson<T>(path: string, body: unknown): Promise<T> {
+  const authHeaders = await getAuthHeaders();
   const response = await fetch(`${API_BASE_URL}${path}`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      ...authHeaders,
+    },
     body: JSON.stringify(body),
     cache: "no-store",
+    credentials: "include",
   });
   return parseOrThrow<T>(response, path);
 }
 
 async function deleteRequest(path: string): Promise<void> {
+  const authHeaders = await getAuthHeaders();
   const response = await fetch(`${API_BASE_URL}${path}`, {
     method: "DELETE",
+    headers: { ...authHeaders },
     cache: "no-store",
+    credentials: "include",
   });
   await parseOrThrow<{ ok: true }>(response, path);
 }

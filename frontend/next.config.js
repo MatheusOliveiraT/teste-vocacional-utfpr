@@ -20,6 +20,7 @@ const nextConfig = {
       },
     ],
   },
+  allowedDevOrigins: ["192.168.19.15:3000", "localhost:3000"],
 };
 
 module.exports = nextConfig;

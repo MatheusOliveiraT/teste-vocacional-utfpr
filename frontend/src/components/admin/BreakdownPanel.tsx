@@ -53,12 +53,14 @@ export function BreakdownPanel({
                 {item.value}
               </span>
             </div>
-            <div className="w-full h-2 rounded-full bg-surface-track overflow-hidden">
-              <div
-                className={`h-full rounded-full ${item.barColorClass}`}
-                style={{ width: `${item.percent}%` }}
-              />
-            </div>
+	<div className="w-full h-2 rounded-full bg-surface-track overflow-hidden">
+	  <div
+	    className={`h-full rounded-full transition-all duration-500 ${
+	      item.barColorClass || (item.emphasized ? "bg-primary-container" : "bg-primary-container/60")
+	    }`}
+	    style={{ width: `${Math.max(item.percent ?? 0, 2)}%` }}
+	  />
+	</div>
           </div>
         ))}
       </div>
